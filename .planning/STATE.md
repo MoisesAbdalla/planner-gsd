@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 current_phase: 1
 current_phase_name: Acesso e espaço compartilhado
 status: executing
-stopped_at: Completed 01-01-PLAN.md (Task 3 + checkpoint resolvido)
-last_updated: "2026-08-28T12:25:57.817Z"
+stopped_at: Completed 01-02-PLAN.md (Task 1 + Task 2 - convite sem backend)
+last_updated: "2026-08-28T12:49:07.405Z"
 last_activity: 2026-08-28
 last_activity_desc: ROADMAP.md criado, 56/56 requisitos v1 mapeados
-state_head: 7ce5e9c27efc518eda3aedeefe1b2677725f2d79
+state_head: 50426643226443b4b8a408e16e0ddbedc9d8ba77
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 6
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (atualizado 2026-08-27)
 ## Current Position
 
 Phase: 1 (Acesso e espaço compartilhado) — EXECUTING
-Plan: 1 de 6 na fase atual (01-01 completo)
+Plan: 2 de 6 na fase atual (01-01, 01-02 completos)
 Status: Executing
-Last activity: 2026-08-28 — Plano 01-01 completo (fatia tracer: login Google, bootstrap de workspace, isolamento por membership)
+Last activity: 2026-08-28 — Plano 01-02 completo (convite sem backend: Security Rules + cliente transacional)
 
-Progress: [░░░░░░░░░░] 0% (fases completas; 1 de 6 planos da Fase 1 concluído)
+Progress: [░░░░░░░░░░] 0% (fases completas; 2 de 6 planos da Fase 1 concluídos)
 
 ## Performance Metrics
 
@@ -59,6 +59,7 @@ Progress: [░░░░░░░░░░] 0% (fases completas; 1 de 6 planos da
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 01 P01 | 50min | 2 tasks | 10 files |
+| Phase 01 P02 | ~25min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,8 @@ Decisões completas em PROJECT.md (Key Decisions). Recentes que afetam o trabalh
 - [Roadmap]: Tarefas (Fase 6) depende só da Fase 1 e é paralelizável com as fases 2–5.
 - [Phase 1]: Checkpoint 01-01 Task 2 resolvido: memberIds: string[] em /workspaces/{id} (não subcoleção) — decisão de sentido único herdada pelas Security Rules das fases 2-6
 - [Phase 1]: vitest.config.ts: fileParallelism false no projeto node — arquivos de teste contra o Firestore Emulator compartilham o mesmo projectId e corrompem estado se rodarem em paralelo
+- [Phase 1]: expiresAt do convite comparado por faixa (request.time, +8d) em vez de igualdade estrita — cliente não prevê o instante exato do commit no servidor
+- [Phase 1]: joinWorkspace() mapeia erro genérico de permissão da transação perdedora para invite-already-used — forma concreta do risco residual T-01-08 aceito
 
 ### Pending Todos
 
@@ -94,6 +97,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-08-28T12:25:57.802Z
-Stopped at: Completed 01-01-PLAN.md (Task 3 + checkpoint resolvido)
+Last session: 2026-08-28T12:49:07.389Z
+Stopped at: Completed 01-02-PLAN.md (Task 1 + Task 2 - convite sem backend)
 Resume file: None
