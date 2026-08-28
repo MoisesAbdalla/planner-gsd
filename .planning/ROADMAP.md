@@ -87,7 +87,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 01-05-PLAN.md — Convite na tela: diálogo de compartilhar e entrada pelo link com as três falhas (wave 4)
+- [x] 01-05-PLAN.md — Convite na tela: diálogo de compartilhar e entrada pelo link com as três falhas (wave 4)
 - [ ] 01-06-PLAN.md — Categorias na tela: lista, criar/editar com a paleta fixa e arquivar (wave 4)
 
 **Cross-cutting constraints:**

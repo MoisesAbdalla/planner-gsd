@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 current_phase: 1
 current_phase_name: Acesso e espaço compartilhado
 status: executing
-stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-08-28T17:23:37.534Z"
+stopped_at: Completed 01-05-PLAN.md
+last_updated: "2026-08-28T17:46:19.181Z"
 last_activity: 2026-08-28
-last_activity_desc: Plano 01-04 completo - categorias como dado (seeding idempotente, regra de subcoleção, useCategories/useCategoryMutations)
-state_head: 0b534f2e59819544845381a0729070b72b363954
+last_activity_desc: Plano 01-05 completo - convite na tela (diálogo de convidar, resgate por link, três telas de falha)
+state_head: 0f896d41cceff090b118ece20e82c5b00c8f6043
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 5
   percent: 0
 ---
 
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (atualizado 2026-08-27)
 ## Current Position
 
 Phase: 1 (Acesso e espaço compartilhado) — EXECUTING
-Plan: 4 de 6 na fase atual (01-01, 01-02, 01-03, 01-04 completos)
+Plan: 5 de 6 na fase atual (01-01, 01-02, 01-03, 01-04, 01-05 completos)
 Status: Executing
-Last activity: 2026-08-28 — Plano 01-04 completo (categorias como dado: seeding idempotente, regra de subcoleção, camada reativa)
+Last activity: 2026-08-28 — Plano 01-05 completo (convite na tela: diálogo de convidar, resgate por link, três telas de falha)
 
-Progress: [░░░░░░░░░░] 0% (fases completas; 4 de 6 planos da Fase 1 concluídos)
+Progress: [░░░░░░░░░░] 0% (fases completas; 5 de 6 planos da Fase 1 concluídos)
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Progress: [░░░░░░░░░░] 0% (fases completas; 4 de 6 planos da
 | Phase 01 P02 | ~25min | 2 tasks | 5 files |
 | Phase 01 P03 | ~90min | 3 tasks | 36 files |
 | Phase 01 P04 | ~50min | 2 tasks | 10 files |
+| Phase 01-acesso-e-espa-o-compartilhado P05 | ~30min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,7 @@ Decisões completas em PROJECT.md (Key Decisions). Recentes que afetam o trabalh
 - [Phase 1]: AuthStatus ganhou o valor 'error' para o BootErrorScreen (E7/error) ser alcançável — onAuthStateChanged agora usa o callback de erro
 - [Phase 1]: Open Question 2 de 01-RESEARCH.md resolvida ao vivo — get() de uma Security Rule avaliada dentro de um writeBatch vê o estado anterior ao batch inteiro, mesmo para outro documento do mesmo batch; criar workspace + categoria filha juntos é NEGADO, confirmando que a separação em dois passos aguardados em bootstrapNewWorkspace é estritamente necessária
 - [Phase 1]: bootstrapNewWorkspace só chamava seedDefaultCategories na criação do workspace (grep -c precisava retornar 1); corrigido com uma chamada adicional em WorkspaceProvider.tsx quando o workspace já existia, para que a resumibilidade do seeding (CAT-01/empty) se sustente também na reabertura do app, não só na criação
+- [Phase 01-acesso-e-espa-o-compartilhado]: Convite na tela: token do convite sobrevive ao redirect do Google via sessionStorage dedicado (src/features/invite/pendingToken.ts); WorkspaceProvider nunca cria espaco proprio enquanto ha um resgate pendente (D-07), assinando /users/{uid} reativamente — Plano 01-05 exigia coordenacao entre entrar.tsx e WorkspaceProvider.tsx sem depender de flag/state global
 
 ### Pending Todos
 
@@ -104,6 +106,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-08-28T17:23:37.514Z
-Stopped at: Completed 01-04-PLAN.md
+Last session: 2026-08-28T17:45:07.369Z
+Stopped at: Completed 01-05-PLAN.md
 Resume file: None

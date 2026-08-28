@@ -19,8 +19,8 @@ Requisitos da primeira versão. Cada um mapeia para uma fase do roadmap.
 - [x] **AUTH-01**: Usuário entra no app com sua conta Google
 - [x] **AUTH-02**: Usuário sai da conta
 - [x] **AUTH-03**: No primeiro login, um espaço compartilhado é criado com o usuário como membro
-- [ ] **AUTH-04**: Usuário gera um código de convite para o seu espaço
-- [ ] **AUTH-05**: Segunda pessoa entra no espaço colando o código de convite
+- [x] **AUTH-04**: Usuário gera um código de convite para o seu espaço
+- [x] **AUTH-05**: Segunda pessoa entra no espaço colando o código de convite
 - [ ] **AUTH-06**: Membros do mesmo espaço veem os mesmos lançamentos, contas, orçamentos e tarefas
 - [x] **AUTH-07**: Usuário de um espaço não consegue ler nem escrever dados de outro espaço
 
@@ -153,8 +153,8 @@ Preenchido durante a criação do roadmap (2026-08-27).
 | AUTH-01 | Phase 1 | Complete |
 | AUTH-02 | Phase 1 | Complete |
 | AUTH-03 | Phase 1 | Complete |
-| AUTH-04 | Phase 1 | Pending |
-| AUTH-05 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Complete |
+| AUTH-05 | Phase 1 | Complete |
 | AUTH-06 | Phase 1 | Pending |
 | AUTH-07 | Phase 1 | Complete |
 | CAT-01 | Phase 1 | Complete |
