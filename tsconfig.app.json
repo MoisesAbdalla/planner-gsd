@@ -16,6 +16,16 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
+    /* Path alias — exigido pelo shadcn CLI (init falha sem um alias
+       resolvível); "@/*" aponta pra dentro de src/, espelhado em
+       vite.config.ts (resolve.alias) para o bundler resolver em runtime.
+       Sem baseUrl: TS 6 marca baseUrl como deprecated (removido na TS 7) —
+       moduleResolution "bundler" resolve "paths" relativo ao próprio
+       tsconfig.json sem precisar dele. */
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
     /* Linting */
     "noUnusedLocals": true,
     "noUnusedParameters": true,

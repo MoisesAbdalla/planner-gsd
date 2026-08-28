@@ -1,4 +1,136 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
+
+/* Plus Jakarta Sans variável — só o eixo de peso (wght), sem itálico (não
+   usado neste app). O subset "latin" já cobre U+0000-00FF, ou seja, todos
+   os diacríticos do português (ã, ç, é, õ) — sem precisar do subset
+   latin-ext à parte. Self-hosted via @fontsource: sem request de terceiro
+   (fonts.googleapis.com) em runtime, sem FOUT dependente de rede externa. */
+@import '@fontsource-variable/plus-jakarta-sans/wght.css';
+
+/*
+ * Design tokens — transcritos de 01-UI-SPEC.md §Design System, §Spacing
+ * Scale, §Typography, §Color. Este bloco é a fonte da linguagem visual que
+ * as Fases 2-6 herdam (D-16, D-12, D-17 — todos `costly`/`one-way` de
+ * reverter). Os valores hsl() abaixo são transcrição literal da tabela
+ * Color do UI-SPEC — não arredondados, não redecididos aqui.
+ *
+ * Nomenclatura dos tokens de cor (decisão de execução, não de valor):
+ * além dos 8 papéis nomeados no UI-SPEC (dominant, secondary, border,
+ * text-primary, text-secondary, accent, positive, destructive), este
+ * arquivo também define os slots CANÔNICOS que as primitivas shadcn
+ * copiadas em src/shared/ui/ esperam (background, foreground, card,
+ * popover, primary, secondary, muted, accent, destructive, border, input,
+ * ring — convenção do próprio shadcn/Radix). Onde os dois vocabulários
+ * colidem em NOME mas não em CONCEITO — "secondary" no UI-SPEC é a
+ * superfície elevada (cards/header/rail, ~30% da paleta); "secondary" no
+ * shadcn é a variante neutra de botão (conceito não especificado pelo
+ * UI-SPEC, deixado à discrição de execução — ver Claude's Discretion em
+ * 01-CONTEXT.md) — a superfície elevada do UI-SPEC vive aqui como
+ * `--color-surface` (aliás de --color-card/--color-popover) para nunca
+ * colidir com o botão "secondary" do shadcn. Todo componente autoral desta
+ * fase (AppShell, nav, telas) usa `bg-surface`/`bg-dominant`/`text-fg`/
+ * `text-fg-muted`, nunca os nomes canônicos do shadcn diretamente.
+ */
+@theme {
+  /* Tipografia — Plus Jakarta Sans, 4 papéis, 2 pesos (400/600). Nunca um
+     quinto tamanho; texto menor que "label" reaproveita label a 70% de
+     opacidade de text-secondary (ver componentes). */
+  --font-sans: 'Plus Jakarta Sans Variable', system-ui, -apple-system,
+    'Segoe UI', sans-serif;
+
+  --text-label: 0.875rem; /* 14px */
+  --text-label--line-height: 1.4;
+  --text-body: 1rem; /* 16px */
+  --text-body--line-height: 1.5;
+  --text-heading: 1.375rem; /* 22px */
+  --text-heading--line-height: 1.2;
+  --text-display: 2rem; /* 32px */
+  --text-display--line-height: 1.15;
+
+  /* Espaçamento — 7 degraus (4/8/16/24/32/48/64px). D-15: na dúvida entre
+     dois degraus, prefira o maior — "poucos elementos por tela" é critério
+     de aceite. Nomeados (gap-lg, p-xl…) além da escala numérica nativa do
+     Tailwind, para leitura semântica no código do shell. */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+
+  /* Raio — cantos arredondados generosos (D-17, personalidade calorosa,
+     não-bancária). Sobrescreve a escala padrão do Tailwind: rounded-lg em
+     qualquer parte do app (inclusive nas primitivas shadcn copiadas, que já
+     usam rounded-lg/rounded-md/rounded-xl) herda este raio maior. */
+  --radius-sm: 0.5rem; /* 8px */
+  --radius-md: 0.75rem; /* 12px */
+  --radius-lg: 1rem; /* 16px — card da tela de entrar (UI-SPEC Screen 1) */
+  --radius-xl: 1.25rem; /* 20px — diálogos, bottom sheets */
+  --radius-2xl: 1.5rem; /* 24px — reservado para superfícies grandes */
+
+  /* Cor — tema claro por padrão; o bloco @media (prefers-color-scheme)
+     abaixo sobrescreve os MESMOS custom properties para o tema escuro. Os 8
+     papéis do UI-SPEC primeiro, depois os slots canônicos do shadcn. */
+
+  /* Dominant (60%) — fundo da aplicação atrás de tudo. */
+  --color-dominant: hsl(38 28% 96%);
+  /* Secondary (30%, UI-SPEC) / "surface" nesta implementação — cards,
+     header, rail, diálogos, a camada elevada. */
+  --color-surface: hsl(0 0% 100%);
+  --color-border: hsl(35 18% 88%);
+  /* Text primary / Text secondary do UI-SPEC — nomeados --color-fg e
+     --color-fg-muted para não gerar a classe "text-text-primary". */
+  --color-fg: hsl(30 15% 15%);
+  --color-fg-muted: hsl(30 10% 40%);
+  /* Accent (10%, âmbar/mel) — reservado para: botão primário, indicador do
+     item ativo na navegação, anel de foco de teclado, ações inline de
+     texto. Nunca em cor de categoria, texto de corpo, bordas, desabilitado. */
+  --color-accent: hsl(38 65% 42%);
+  --color-positive: hsl(152 30% 34%);
+  --color-destructive: hsl(8 55% 44%);
+
+  /* Slots canônicos shadcn/Radix — aliases dos papéis acima, mais os
+     complementos que só existem no vocabulário de componente (foreground
+     de cada superfície, e o par neutro "secondary" de botão, sem
+     equivalente direto no UI-SPEC — discrição de execução). */
+  --color-background: var(--color-dominant);
+  --color-foreground: var(--color-fg);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-fg);
+  --color-popover: var(--color-surface);
+  --color-popover-foreground: var(--color-fg);
+  --color-primary: var(--color-accent);
+  --color-primary-foreground: hsl(38 45% 99%);
+  --color-secondary: hsl(35 20% 90%);
+  --color-secondary-foreground: var(--color-fg);
+  --color-muted: hsl(38 22% 93%);
+  --color-muted-foreground: var(--color-fg-muted);
+  --color-accent-foreground: var(--color-fg);
+  --color-input: var(--color-border);
+  --color-ring: var(--color-accent);
+}
+
+/* Tema escuro — segue o sistema operacional (D-16), sem alternador manual
+   na interface. Mesmos custom properties, valores da coluna Dark do
+   UI-SPEC §Color. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-dominant: hsl(30 8% 11%);
+    --color-surface: hsl(30 8% 16%);
+    --color-border: hsl(30 8% 26%);
+    --color-fg: hsl(36 15% 94%);
+    --color-fg-muted: hsl(32 8% 66%);
+    --color-accent: hsl(38 60% 62%);
+    --color-positive: hsl(152 28% 58%);
+    --color-destructive: hsl(8 50% 64%);
+
+    --color-primary-foreground: hsl(30 20% 12%);
+    --color-secondary: hsl(30 8% 23%);
+    --color-muted: hsl(30 8% 18%);
+  }
+}
 
 :root {
   color-scheme: light dark;
@@ -7,10 +139,34 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family:
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
+  font-family: var(--font-sans);
+  background-color: var(--color-dominant);
+  color: var(--color-fg);
+}
+
+/* Regra de numerais (UI-SPEC §Typography): todo contexto numérico — valor
+   monetário, data, contador — usa tabular-nums, para colunas alinharem e o
+   "quanto sobra" não "pular" visualmente quando o dígito muda. Aplicada
+   globalmente via classe utilitária (Tailwind já expõe tabular-nums, mas o
+   projeto reforça a regra em CSS puro aqui para não depender de lembrar a
+   classe em toda tela numérica das Fases 2+). */
+.tabular-nums,
+[data-numeric] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Movimento reduzido (UI-SPEC §Accessibility): transições já são curtas por
+   padrão (150-200ms, mandato de calma D-15); com prefers-reduced-motion,
+   qualquer animação de entrada de diálogo/sheet (tw-animate-css:
+   animate-in/animate-out) e a transição da pílula de navegação ativa viram
+   troca instantânea de estado — nunca desaparecem, só perdem a duração. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
