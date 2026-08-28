@@ -17,7 +17,7 @@ Requisitos da primeira versão. Cada um mapeia para uma fase do roadmap.
 ### Autenticação e espaço compartilhado
 
 - [x] **AUTH-01**: Usuário entra no app com sua conta Google
-- [ ] **AUTH-02**: Usuário sai da conta
+- [x] **AUTH-02**: Usuário sai da conta
 - [x] **AUTH-03**: No primeiro login, um espaço compartilhado é criado com o usuário como membro
 - [ ] **AUTH-04**: Usuário gera um código de convite para o seu espaço
 - [ ] **AUTH-05**: Segunda pessoa entra no espaço colando o código de convite
@@ -151,7 +151,7 @@ Preenchido durante a criação do roadmap (2026-08-27).
 | PLAT-03 | Phase 3 | Pending |
 | PLAT-04 | Phase 2 | Pending |
 | AUTH-01 | Phase 1 | Complete |
-| AUTH-02 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Complete |
 | AUTH-03 | Phase 1 | Complete |
 | AUTH-04 | Phase 1 | Pending |
 | AUTH-05 | Phase 1 | Pending |
