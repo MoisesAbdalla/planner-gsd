@@ -94,19 +94,53 @@ service cloud.firestore {
       match /categories/{categoryId} {
         allow read: if isMember(workspaceId);
 
+        // WR-02: `archivedAt`/`canArchive`/`isSystemDefault` agora são
+        // exigidos com o tipo certo no create — sem isso, um create forjado
+        // que omite `archivedAt` deixa o campo `undefined`, e o filtro
+        // `archivedAt !== null` de useCategories.ts (T-01-04-adjacent)
+        // classifica a categoria recém-criada como já arquivada.
         allow create: if isMember(workspaceId)
           && request.resource.data.name is string
           && request.resource.data.name.size() > 0
-          && request.resource.data.color is string;
+          && request.resource.data.name.size() <= 80
+          && request.resource.data.color is string
+          && request.resource.data.color.size() <= 40
+          && request.resource.data.archivedAt == null
+          && request.resource.data.canArchive is bool
+          && request.resource.data.isSystemDefault is bool;
 
         // Trava de servidor para "Outros nunca arquiva" (D-11, CAT-04,
         // T-01-18): nega qualquer update que defina archivedAt != null num
         // documento cujo canArchive ARMAZENADO (resource.data, não o
         // payload) já é false — defesa em profundidade sobre o botão
         // desabilitado do cliente, fecha o caso de requisição forjada.
+        // WR-02: além disso, um update só pode tocar name/color/archivedAt
+        // (nunca canArchive/isSystemDefault, que são fixados na criação e
+        // nunca podem mudar por este caminho — é exatamente essa lacuna que
+        // permitia forjar canArchive/isSystemDefault via update direto).
+        // `createdAt` entra na allowlist por um motivo diferente de
+        // segurança: seed.ts semeia com um `writeBatch` de `set()` (grava o
+        // documento inteiro, não um merge parcial) e o teste permanente
+        // "seed/concorrência" (tests/categories.test.ts) prova, contra o
+        // emulador real, que dois seedings concorrentes do mesmo espaço
+        // devem convergir — quando o segundo batch perde a corrida e
+        // reescreve um documento que o primeiro já criou, o
+        // `serverTimestamp()` do `createdAt` resolve para um instante
+        // diferente do já gravado, e last-write-wins é o comportamento
+        // aceito conscientemente para concorrência (D-21). Não é uma
+        // brecha: name/color continuam validados, e canArchive/
+        // isSystemDefault continuam fora da allowlist, então mudá-los via
+        // update (a única coisa que este WR-02 precisa fechar) segue negado.
         allow update: if isMember(workspaceId)
           && !(resource.data.canArchive == false
-               && request.resource.data.archivedAt != null);
+               && request.resource.data.archivedAt != null)
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['name', 'color', 'archivedAt', 'createdAt'])
+          && request.resource.data.name is string
+          && request.resource.data.name.size() > 0
+          && request.resource.data.name.size() <= 80
+          && request.resource.data.color is string
+          && request.resource.data.color.size() <= 40;
 
         // Nunca excluir — arquivar preserva o histórico (D-11, CAT-04); um
         // categoryId já gravado num lançamento das fases seguintes precisa

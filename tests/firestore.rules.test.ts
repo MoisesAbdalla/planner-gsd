@@ -590,6 +590,67 @@ describe('categorias — criação (CAT-02, T-01-04)', () => {
       }),
     )
   })
+
+  // WR-02: um create forjado que omite archivedAt deixa o campo undefined,
+  // e o filtro `archivedAt !== null` de useCategories.ts classifica a
+  // categoria recém-criada como já arquivada — a regra agora exige o campo.
+  test('alice é negada ao criar categoria forjada sem o campo archivedAt', async () => {
+    await seedCategoryWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertFails(
+      setDoc(doc(aliceDb, 'workspaces/wsA/categories/sem-archived-at'), {
+        name: 'Sem Archived At',
+        color: 'saude',
+        isSystemDefault: false,
+        canArchive: true,
+        createdAt: serverTimestamp(),
+      }),
+    )
+  })
+
+  test('alice é negada ao criar categoria com canArchive de tipo errado (string em vez de bool)', async () => {
+    await seedCategoryWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertFails(
+      setDoc(doc(aliceDb, 'workspaces/wsA/categories/can-archive-string'), {
+        name: 'Can Archive String',
+        color: 'saude',
+        isSystemDefault: false,
+        canArchive: 'true',
+        archivedAt: null,
+        createdAt: serverTimestamp(),
+      }),
+    )
+  })
+
+  test('alice é negada ao criar categoria sem o campo isSystemDefault', async () => {
+    await seedCategoryWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertFails(
+      setDoc(doc(aliceDb, 'workspaces/wsA/categories/sem-is-system-default'), {
+        name: 'Sem Is System Default',
+        color: 'saude',
+        canArchive: true,
+        archivedAt: null,
+        createdAt: serverTimestamp(),
+      }),
+    )
+  })
+
+  test('alice é negada ao criar categoria com name maior que 80 caracteres', async () => {
+    await seedCategoryWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertFails(
+      setDoc(doc(aliceDb, 'workspaces/wsA/categories/nome-longo'), {
+        name: 'x'.repeat(81),
+        color: 'saude',
+        isSystemDefault: false,
+        canArchive: true,
+        archivedAt: null,
+        createdAt: serverTimestamp(),
+      }),
+    )
+  })
 })
 
 describe('categorias — archive e delete (CAT-04, T-01-18, T-01-19)', () => {
@@ -627,6 +688,51 @@ describe('categorias — archive e delete (CAT-04, T-01-18, T-01-19)', () => {
     await assertSucceeds(
       updateDoc(doc(aliceDb, 'workspaces/wsA/categories/mercado'), {
         archivedAt: serverTimestamp(),
+      }),
+    )
+  })
+
+  // WR-02: antes desta correção, um update que tocasse canArchive/
+  // isSystemDefault só era barrado pela combinação específica
+  // canArchive==false && archivedAt!=null — qualquer outra tentativa de
+  // forjar esses campos passava livre. affectedKeys().hasOnly(['name',
+  // 'color', 'archivedAt']) fecha essa lacuna.
+  test('update: alice é negada ao forjar canArchive de mercado (true -> false) via update direto', async () => {
+    await seedCategoryWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertFails(
+      updateDoc(doc(aliceDb, 'workspaces/wsA/categories/mercado'), {
+        canArchive: false,
+      }),
+    )
+  })
+
+  test('update: alice é negada ao forjar isSystemDefault de uma categoria própria via update direto', async () => {
+    await seedCategoryWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertSucceeds(
+      setDoc(doc(aliceDb, 'workspaces/wsA/categories/propria2'), {
+        name: 'Própria 2',
+        color: 'lazer',
+        isSystemDefault: false,
+        canArchive: true,
+        archivedAt: null,
+        createdAt: serverTimestamp(),
+      }),
+    )
+    await assertFails(
+      updateDoc(doc(aliceDb, 'workspaces/wsA/categories/propria2'), {
+        isSystemDefault: true,
+      }),
+    )
+  })
+
+  test('update: alice é negada ao renomear categoria com name vazio', async () => {
+    await seedCategoryWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertFails(
+      updateDoc(doc(aliceDb, 'workspaces/wsA/categories/mercado'), {
+        name: '',
       }),
     )
   })
