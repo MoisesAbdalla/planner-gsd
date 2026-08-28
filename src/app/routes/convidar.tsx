@@ -1,7 +1,9 @@
-// Rota alcançável a partir do menu do avatar (D-14). O plano 01-05
-// substitui este corpo pela tela real (UI-SPEC Screen 3, consumindo
-// createInvite/inviteUrl do plano 01-02) sem tocar em router.tsx — esta
-// fase só garante que a navegação até aqui já funciona ponta a ponta.
+// Rota "/convidar" — monta o diálogo real de convite sobre o shell (UI-SPEC
+// Screen 3, plano 01-05). Fechar o diálogo (X, Escape, clique fora, ou
+// concluir a ação) volta para o módulo anterior — ver
+// InviteDialog.handleOpenChange.
+import { InviteDialog } from '@/features/invite/components/InviteDialog'
+
 export default function ConvidarPage() {
-  return <h1 className="text-heading font-semibold text-fg">Convidar alguém</h1>
+  return <InviteDialog />
 }
