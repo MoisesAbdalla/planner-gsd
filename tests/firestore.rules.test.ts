@@ -472,3 +472,128 @@ describe('workspace/membro não mexe na lista (AUTH-07)', () => {
     await assertFails(updateDoc(doc(aliceDb, 'workspaces/wsA'), { memberIds: ['alice'] }))
   })
 })
+
+// ---------------------------------------------------------------------
+// 01-04: categorias como dado (CAT-01..04, AUTH-06/07) — ver
+// 01-RESEARCH.md §Seeding das 12 categorias, §Arquivar vs. excluir e o
+// bloco <threat_model> do plano 01-04 (T-01-04, T-01-18, T-01-19).
+// ---------------------------------------------------------------------
+
+async function seedCategoryWorkspace() {
+  await testEnv.withSecurityRulesDisabled(async (ctx) => {
+    const adminDb = ctx.firestore()
+    await setDoc(doc(adminDb, 'workspaces/wsA'), {
+      name: 'Casa A',
+      ownerId: 'alice',
+      memberIds: ['alice'],
+      createdAt: Timestamp.now(),
+    })
+    await setDoc(doc(adminDb, 'workspaces/wsA/categories/mercado'), {
+      name: 'Mercado',
+      color: 'mercado',
+      isSystemDefault: true,
+      canArchive: true,
+      archivedAt: null,
+      createdAt: Timestamp.now(),
+    })
+    await setDoc(doc(adminDb, 'workspaces/wsA/categories/outros'), {
+      name: 'Outros',
+      color: 'outros',
+      isSystemDefault: true,
+      canArchive: false,
+      archivedAt: null,
+      createdAt: Timestamp.now(),
+    })
+  })
+}
+
+describe('categorias — criação (CAT-02, T-01-04)', () => {
+  test('alice cria uma categoria com name/color válidos — sucesso', async () => {
+    await seedCategoryWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertSucceeds(
+      setDoc(doc(aliceDb, 'workspaces/wsA/categories/farmacia'), {
+        name: 'Farmácia',
+        color: 'saude',
+        isSystemDefault: false,
+        canArchive: true,
+        archivedAt: null,
+        createdAt: serverTimestamp(),
+      }),
+    )
+  })
+
+  test('alice é negada ao criar categoria com name vazio', async () => {
+    await seedCategoryWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertFails(
+      setDoc(doc(aliceDb, 'workspaces/wsA/categories/vazia'), {
+        name: '',
+        color: 'saude',
+        isSystemDefault: false,
+        canArchive: true,
+        archivedAt: null,
+        createdAt: serverTimestamp(),
+      }),
+    )
+  })
+})
+
+describe('categorias — archive e delete (CAT-04, T-01-18, T-01-19)', () => {
+  test('alice arquiva mercado definindo archivedAt — sucesso, o documento continua existindo depois', async () => {
+    await seedCategoryWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertSucceeds(
+      updateDoc(doc(aliceDb, 'workspaces/wsA/categories/mercado'), {
+        archivedAt: serverTimestamp(),
+      }),
+    )
+
+    const snap = await getDoc(doc(aliceDb, 'workspaces/wsA/categories/mercado'))
+    expect(snap.exists()).toBe(true)
+  })
+
+  test('archive: alice é negada ao definir archivedAt em outros, mesmo forjando a requisição', async () => {
+    await seedCategoryWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertFails(
+      updateDoc(doc(aliceDb, 'workspaces/wsA/categories/outros'), {
+        archivedAt: serverTimestamp(),
+      }),
+    )
+  })
+
+  test('archive: arquivar mercado duas vezes seguidas continua sendo permitido (CAT-04 idempotency)', async () => {
+    await seedCategoryWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertSucceeds(
+      updateDoc(doc(aliceDb, 'workspaces/wsA/categories/mercado'), {
+        archivedAt: serverTimestamp(),
+      }),
+    )
+    await assertSucceeds(
+      updateDoc(doc(aliceDb, 'workspaces/wsA/categories/mercado'), {
+        archivedAt: serverTimestamp(),
+      }),
+    )
+  })
+
+  test('archive/delete: alice é negada ao excluir qualquer documento de categoria, inclusive uma que ela mesma criou', async () => {
+    await seedCategoryWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+
+    await assertFails(deleteDoc(doc(aliceDb, 'workspaces/wsA/categories/mercado')))
+
+    await assertSucceeds(
+      setDoc(doc(aliceDb, 'workspaces/wsA/categories/propria'), {
+        name: 'Própria',
+        color: 'lazer',
+        isSystemDefault: false,
+        canArchive: true,
+        archivedAt: null,
+        createdAt: serverTimestamp(),
+      }),
+    )
+    await assertFails(deleteDoc(doc(aliceDb, 'workspaces/wsA/categories/propria')))
+  })
+})

@@ -74,6 +74,36 @@ service cloud.firestore {
 
       allow delete: if false;
 
+      // Subcoleção de categorias do workspace (categoryId) — CAT-01..04,
+      // AUTH-06/07 (plano 01-04). Regra ESPECÍFICA que coexiste em OR com o
+      // bloco genérico de isolamento logo abaixo (Firestore avalia todos os
+      // match blocks que casam o mesmo path e permite se QUALQUER um
+      // autorizar) — este bloco é o único que ABRE escrita em categories,
+      // o genérico continua fechado para write.
+      match /categories/{categoryId} {
+        allow read: if isMember(workspaceId);
+
+        allow create: if isMember(workspaceId)
+          && request.resource.data.name is string
+          && request.resource.data.name.size() > 0
+          && request.resource.data.color is string;
+
+        // Trava de servidor para "Outros nunca arquiva" (D-11, CAT-04,
+        // T-01-18): nega qualquer update que defina archivedAt != null num
+        // documento cujo canArchive ARMAZENADO (resource.data, não o
+        // payload) já é false — defesa em profundidade sobre o botão
+        // desabilitado do cliente, fecha o caso de requisição forjada.
+        allow update: if isMember(workspaceId)
+          && !(resource.data.canArchive == false
+               && request.resource.data.archivedAt != null);
+
+        // Nunca excluir — arquivar preserva o histórico (D-11, CAT-04); um
+        // categoryId já gravado num lançamento das fases seguintes precisa
+        // continuar resolvendo. Nenhum chamador, nem o próprio criador,
+        // pode excluir (T-01-19).
+        allow delete: if false;
+      }
+
       // Isolamento genérico para qualquer subcoleção direta do workspace
       // (categories chega no 01-04; transactions/tasks em fases seguintes)
       // — leitura sempre gated por isMember(); toda escrita fica fechada

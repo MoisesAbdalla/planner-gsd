@@ -11,6 +11,7 @@ import {
   type Timestamp,
 } from 'firebase/firestore'
 import { db } from '../firebase/client'
+import * as categorySeeding from '../../modules/categories/data/seed'
 
 export type Workspace = {
   id: string
@@ -54,6 +55,19 @@ export async function bootstrapNewWorkspace(uid: string): Promise<string> {
   })
   batch.set(doc(firestore, 'users', uid), { workspaceId: workspaceRef.id })
   await batch.commit()
+
+  // Passo SEPARADO, aguardado, nunca no mesmo writeBatch acima — confirmado
+  // empiricamente no Open Question 2 de 01-RESEARCH.md (ver comentário de
+  // topo de src/modules/categories/data/seed.ts e o SUMMARY desta
+  // execução): get() dentro de uma regra avaliada no MESMO batch que cria
+  // o documento pai vê o estado anterior ao batch inteiro, então a regra
+  // de create de categories (isMember, via get() no workspace) negaria a
+  // escrita se estivesse agrupada aqui. Se este passo falhar, o workspace
+  // continua existindo com zero categorias — consequência aceita
+  // (01-RESEARCH.md §Pitfall); a função abaixo é idempotente e resumível
+  // por IDs determinísticos, então uma nova chamada completa o que faltar
+  // sem duplicar.
+  await categorySeeding.seedDefaultCategories(workspaceRef.id)
 
   return workspaceRef.id
 }
