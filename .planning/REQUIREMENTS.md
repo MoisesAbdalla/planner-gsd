@@ -9,8 +9,8 @@ Requisitos da primeira versão. Cada um mapeia para uma fase do roadmap.
 
 ### Plataforma
 
-- [ ] **PLAT-01**: Interface, datas e valores aparecem em português brasileiro com moeda R$
-- [ ] **PLAT-02**: Todas as telas são usáveis no celular e no desktop sem rolagem horizontal
+- [x] **PLAT-01**: Interface, datas e valores aparecem em português brasileiro com moeda R$
+- [x] **PLAT-02**: Todas as telas são usáveis no celular e no desktop sem rolagem horizontal
 - [ ] **PLAT-03**: A soma das parcelas de uma compra parcelada é sempre exatamente igual ao valor total da compra, em qualquer número de parcelas de 2x a 24x
 - [ ] **PLAT-04**: Um lançamento feito em qualquer horário do dia aparece no dia e no mês corretos, sem desvio de fuso horário
 
@@ -21,15 +21,15 @@ Requisitos da primeira versão. Cada um mapeia para uma fase do roadmap.
 - [x] **AUTH-03**: No primeiro login, um espaço compartilhado é criado com o usuário como membro
 - [x] **AUTH-04**: Usuário gera um código de convite para o seu espaço
 - [x] **AUTH-05**: Segunda pessoa entra no espaço colando o código de convite
-- [ ] **AUTH-06**: Membros do mesmo espaço veem os mesmos lançamentos, contas, orçamentos e tarefas
+- [x] **AUTH-06**: Membros do mesmo espaço veem os mesmos lançamentos, contas, orçamentos e tarefas
 - [x] **AUTH-07**: Usuário de um espaço não consegue ler nem escrever dados de outro espaço
 
 ### Categorias
 
 - [x] **CAT-01**: Espaço novo já nasce com um conjunto de categorias padrão em português
-- [ ] **CAT-02**: Usuário cria uma categoria
-- [ ] **CAT-03**: Usuário edita o nome e a cor de uma categoria
-- [ ] **CAT-04**: Usuário arquiva uma categoria sem perder os lançamentos já feitos nela
+- [x] **CAT-02**: Usuário cria uma categoria
+- [x] **CAT-03**: Usuário edita o nome e a cor de uma categoria
+- [x] **CAT-04**: Usuário arquiva uma categoria sem perder os lançamentos já feitos nela
 
 ### Lançamentos
 
@@ -146,8 +146,8 @@ Preenchido durante a criação do roadmap (2026-08-27).
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PLAT-01 | Phase 1 | Pending |
-| PLAT-02 | Phase 1 | Pending |
+| PLAT-01 | Phase 1 | Complete |
+| PLAT-02 | Phase 1 | Complete |
 | PLAT-03 | Phase 3 | Pending |
 | PLAT-04 | Phase 2 | Pending |
 | AUTH-01 | Phase 1 | Complete |
@@ -155,12 +155,12 @@ Preenchido durante a criação do roadmap (2026-08-27).
 | AUTH-03 | Phase 1 | Complete |
 | AUTH-04 | Phase 1 | Complete |
 | AUTH-05 | Phase 1 | Complete |
-| AUTH-06 | Phase 1 | Pending |
+| AUTH-06 | Phase 1 | Complete |
 | AUTH-07 | Phase 1 | Complete |
 | CAT-01 | Phase 1 | Complete |
-| CAT-02 | Phase 1 | Pending |
-| CAT-03 | Phase 1 | Pending |
-| CAT-04 | Phase 1 | Pending |
+| CAT-02 | Phase 1 | Complete |
+| CAT-03 | Phase 1 | Complete |
+| CAT-04 | Phase 1 | Complete |
 | LANC-01 | Phase 2 | Pending |
 | LANC-02 | Phase 2 | Pending |
 | LANC-03 | Phase 2 | Pending |
