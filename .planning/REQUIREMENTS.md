@@ -26,7 +26,7 @@ Requisitos da primeira versão. Cada um mapeia para uma fase do roadmap.
 
 ### Categorias
 
-- [ ] **CAT-01**: Espaço novo já nasce com um conjunto de categorias padrão em português
+- [x] **CAT-01**: Espaço novo já nasce com um conjunto de categorias padrão em português
 - [ ] **CAT-02**: Usuário cria uma categoria
 - [ ] **CAT-03**: Usuário edita o nome e a cor de uma categoria
 - [ ] **CAT-04**: Usuário arquiva uma categoria sem perder os lançamentos já feitos nela
@@ -157,7 +157,7 @@ Preenchido durante a criação do roadmap (2026-08-27).
 | AUTH-05 | Phase 1 | Pending |
 | AUTH-06 | Phase 1 | Pending |
 | AUTH-07 | Phase 1 | Complete |
-| CAT-01 | Phase 1 | Pending |
+| CAT-01 | Phase 1 | Complete |
 | CAT-02 | Phase 1 | Pending |
 | CAT-03 | Phase 1 | Pending |
 | CAT-04 | Phase 1 | Pending |

@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 current_phase: 1
 current_phase_name: Acesso e espaço compartilhado
 status: executing
-stopped_at: Completed 01-03-PLAN.md (Tasks 1-3 - tokens de design, shell de navegação, roteador com gate de autenticação)
-last_updated: "2026-08-28T13:37:00.000Z"
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-08-28T17:23:37.534Z"
 last_activity: 2026-08-28
-last_activity_desc: Plano 01-03 completo - shell de navegação e roteador com gate de autenticação
-state_head: 50426643226443b4b8a408e16e0ddbedc9d8ba77
+last_activity_desc: Plano 01-04 completo - categorias como dado (seeding idempotente, regra de subcoleção, useCategories/useCategoryMutations)
+state_head: 0b534f2e59819544845381a0729070b72b363954
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 6
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (atualizado 2026-08-27)
 ## Current Position
 
 Phase: 1 (Acesso e espaço compartilhado) — EXECUTING
-Plan: 3 de 6 na fase atual (01-01, 01-02, 01-03 completos)
+Plan: 4 de 6 na fase atual (01-01, 01-02, 01-03, 01-04 completos)
 Status: Executing
-Last activity: 2026-08-28 — Plano 01-03 completo (linguagem visual, shell de navegação, roteador com gate de autenticação)
+Last activity: 2026-08-28 — Plano 01-04 completo (categorias como dado: seeding idempotente, regra de subcoleção, camada reativa)
 
-Progress: [░░░░░░░░░░] 0% (fases completas; 3 de 6 planos da Fase 1 concluídos)
+Progress: [░░░░░░░░░░] 0% (fases completas; 4 de 6 planos da Fase 1 concluídos)
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Progress: [░░░░░░░░░░] 0% (fases completas; 3 de 6 planos da
 | Phase 01 P01 | 50min | 2 tasks | 10 files |
 | Phase 01 P02 | ~25min | 2 tasks | 5 files |
 | Phase 01 P03 | ~90min | 3 tasks | 36 files |
+| Phase 01 P04 | ~50min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,8 @@ Decisões completas em PROJECT.md (Key Decisions). Recentes que afetam o trabalh
 - [Phase 1]: CLI shadcn (init/add) está quebrado neste ambiente (bug de detecção de workspace confundindo um diretório irmão não relacionado) — componentes buscados direto do registry oficial via HTTP em vez de `npx shadcn add`; mesma fonte, resultado equivalente
 - [Phase 1]: Gate de autenticação do TanStack Router confirmado ao vivo contra a documentação/exemplo oficial (não mais [ASSUMED]): loading fica fora do RouterProvider inteiro, signed-out vira beforeLoad+redirect numa rota pathless _authenticated, router.invalidate() reage a qualquer mudança de status
 - [Phase 1]: AuthStatus ganhou o valor 'error' para o BootErrorScreen (E7/error) ser alcançável — onAuthStateChanged agora usa o callback de erro
+- [Phase 1]: Open Question 2 de 01-RESEARCH.md resolvida ao vivo — get() de uma Security Rule avaliada dentro de um writeBatch vê o estado anterior ao batch inteiro, mesmo para outro documento do mesmo batch; criar workspace + categoria filha juntos é NEGADO, confirmando que a separação em dois passos aguardados em bootstrapNewWorkspace é estritamente necessária
+- [Phase 1]: bootstrapNewWorkspace só chamava seedDefaultCategories na criação do workspace (grep -c precisava retornar 1); corrigido com uma chamada adicional em WorkspaceProvider.tsx quando o workspace já existia, para que a resumibilidade do seeding (CAT-01/empty) se sustente também na reabertura do app, não só na criação
 
 ### Pending Todos
 
@@ -101,6 +104,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-08-28T13:37:00.000Z
-Stopped at: Completed 01-03-PLAN.md (Tasks 1-3 - tokens de design, shell de navegação, roteador com gate de autenticação)
+Last session: 2026-08-28T17:23:37.514Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None
