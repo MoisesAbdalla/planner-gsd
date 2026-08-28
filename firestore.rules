@@ -1,12 +1,12 @@
 rules_version = '2';
 
-// Task 3 (01-01): as regras reais de /users/{uid} e /workspaces/{workspaceId}
-// entram aqui. A ramificação de update que permite ENTRAR por convite (o
-// caso "!(uid in memberIds)") NÃO está aqui — ela chega no plano 01-02.
-// Nenhum match genérico permissivo permanece: qualquer path não coberto
-// continua negado pela ausência de regra. Isso nunca pode ser afrouxado
-// para destravar desenvolvimento local — o emulador roda contra o mesmo
-// arquivo que vai para produção.
+// Task 3 (01-01): as regras reais de /users/{uid} e /workspaces/{workspaceId}.
+// Task 1 (01-02): a ramificação de update que permite ENTRAR por convite
+// (o caso "!(uid in memberIds)") e a coleção /invites/{token} — ver
+// 01-RESEARCH.md §O desenho central. Nenhum match genérico permissivo
+// permanece: qualquer path não coberto continua negado pela ausência de
+// regra. Isso nunca pode ser afrouxado para destravar desenvolvimento
+// local — o emulador roda contra o mesmo arquivo que vai para produção.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -43,12 +43,89 @@ service cloud.firestore {
         && request.resource.data.name is string
         && request.resource.data.name.size() > 0;
 
-      // Só a atualização normal por membro já existente (ex.: renomear o
-      // espaço) — memberIds não pode mudar por este caminho. A entrada por
-      // convite (acrescentar um novo uid) é assunto do plano 01-02.
+      // Duas ramificações independentes (OR): (1) atualização normal por
+      // membro já existente (ex.: renomear o espaço) — memberIds não muda
+      // por este caminho; (2) entrada por convite (01-02) — acrescentar UM
+      // novo uid, e só quando o token SUBMETIDO PELO CHAMADOR agora
+      // (request.resource.data.joinToken) resolve, via get(), a um convite
+      // pendente e não expirado deste workspace. O ponto que faz esta
+      // ramificação segura é exatamente este: o token vem do payload que o
+      // chamador está enviando agora, nunca de uma busca por "existe algum
+      // convite pendente para este espaço" — essa segunda forma permitiria
+      // qualquer usuário autenticado entrar em qualquer espaço com convite
+      // aberto, mesmo sem jamais ter visto o link (01-RESEARCH.md §2,
+      // Pitfall 2, T-01-02 no <threat_model> do plano 01-02).
+      allow update: if request.auth != null && (
+        (request.auth.uid in resource.data.memberIds
+          && request.resource.data.memberIds == resource.data.memberIds)
+        ||
+        (
+          !(request.auth.uid in resource.data.memberIds)
+          && request.resource.data.memberIds ==
+               resource.data.memberIds.concat([request.auth.uid])
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['memberIds', 'joinToken'])
+          && get(/databases/$(database)/documents/invites/$(request.resource.data.joinToken)).data.workspaceId == workspaceId
+          && get(/databases/$(database)/documents/invites/$(request.resource.data.joinToken)).data.status == 'pending'
+          && get(/databases/$(database)/documents/invites/$(request.resource.data.joinToken)).data.expiresAt > request.time
+          && !exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        )
+      );
+
+      allow delete: if false;
+
+      // Isolamento genérico para qualquer subcoleção direta do workspace
+      // (categories chega no 01-04; transactions/tasks em fases seguintes)
+      // — leitura sempre gated por isMember(); toda escrita fica fechada
+      // aqui de propósito. Firestore faz OR entre match blocks que casam o
+      // mesmo path, então uma regra de escrita mais específica adicionada
+      // depois (com validação de campos) só ABRE permissão, nunca precisa
+      // remover este bloco — e este bloco nunca afrouxa o que vier depois.
+      match /{subcollection}/{docId} {
+        allow read: if isMember(workspaceId);
+        allow write: if false;
+      }
+    }
+
+    // /invites/{token} — coleção de NÍVEL RAIZ, token = ID do documento
+    // (01-RESEARCH.md §O desenho central §1). NUNCA subcoleção do workspace:
+    // D-01 diz que a URL do convite carrega um único código; uma subcoleção
+    // /workspaces/{workspaceId}/invites/{token} exigiria dois identificadores
+    // na URL e cria dependência circular (precisar do workspaceId para
+    // endereçar o próprio convite que revela o workspaceId).
+    match /invites/{token} {
+      // Aberto a qualquer autenticado por ID exato — a segurança não vem de
+      // restringir quem lê um ID conhecido, vem de ninguém conseguir
+      // DESCOBRIR esse ID sem já possuir o link. `list` fecha essa porta.
+      allow get: if request.auth != null;
+      allow list: if false;
+
+      allow create: if request.auth != null
+        && isMember(request.resource.data.workspaceId)
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.usedBy == null
+        && request.resource.data.createdAt == request.time
+        // Igualdade estrita com request.time + duration.value(7, 'd') não é
+        // praticável a partir do cliente (o cliente não sabe o instante
+        // exato em que o servidor vai avaliar request.time no commit) —
+        // relaxado para uma faixa, conforme o próprio <action> do plano
+        // 01-02 previu como fallback. A checagem de prazo nunca é removida
+        // por inteiro. Ver SUMMARY desta execução.
+        && request.resource.data.expiresAt > request.time
+        && request.resource.data.expiresAt < request.time + duration.value(8, 'd');
+
+      // Só a transição pending -> used, e só tocando estes três campos —
+      // ninguém redireciona o convite mudando workspaceId/createdBy na
+      // mesma escrita (T-01-06).
       allow update: if request.auth != null
-        && request.auth.uid in resource.data.memberIds
-        && request.resource.data.memberIds == resource.data.memberIds;
+        && resource.data.status == 'pending'
+        && resource.data.expiresAt > request.time
+        && request.resource.data.status == 'used'
+        && request.resource.data.usedBy == request.auth.uid
+        && request.resource.data.usedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['status', 'usedBy', 'usedAt']);
 
       allow delete: if false;
     }
