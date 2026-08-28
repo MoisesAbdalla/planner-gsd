@@ -1,0 +1,1 @@
+{"content":"JS floats break money math (0.1+0.2!=0.3). Finance apps store integer cents, never floats, and use libs like dinero.js/currency.js/decimal.js for calculations, converting to display format only at render.","source":"web","provider":"websearch","confidence":"MEDIUM","fetched_at":"2026-08-28T01:27:11.067Z","ttl":86400000,"kind":"web"}

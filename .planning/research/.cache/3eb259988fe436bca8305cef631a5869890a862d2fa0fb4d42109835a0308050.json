@@ -1,0 +1,1 @@
+{"content":"Firestore costs scale with document reads not users. Unbounded collection queries, offset pagination (bills skipped-read reads), and reconnecting listeners after 30min offline all cause read amplification and billing surprises.","source":"web","provider":"websearch","confidence":"MEDIUM","fetched_at":"2026-08-28T01:27:11.895Z","ttl":86400000,"kind":"web"}

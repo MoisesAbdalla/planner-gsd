@@ -1,0 +1,1 @@
+{"content":"Industry standard for recurring bill due-day-31: clamp to last valid day of shorter months (min(anchor_day, days_in_month)), e.g. Jan 31 anchor -> Feb 28/29 -> back to Mar 31. Never store an invalid date or silently roll into next month.","source":"web","provider":"websearch","confidence":"MEDIUM","fetched_at":"2026-08-28T01:27:44.577Z","ttl":86400000,"kind":"web"}
