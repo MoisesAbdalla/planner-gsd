@@ -1,14 +1,56 @@
 rules_version = '2';
 
-// Ponto de partida: nega tudo. As regras reais de /users/{uid} e
-// /workspaces/{workspaceId} entram na Task 3 deste plano. Este arquivo nunca
-// pode ser afrouxado para liberar leitura/escrita a qualquer chamador
-// autenticado só para destravar desenvolvimento local — o emulador roda
-// contra o mesmo arquivo que vai para produção.
+// Task 3 (01-01): as regras reais de /users/{uid} e /workspaces/{workspaceId}
+// entram aqui. A ramificação de update que permite ENTRAR por convite (o
+// caso "!(uid in memberIds)") NÃO está aqui — ela chega no plano 01-02.
+// Nenhum match genérico permissivo permanece: qualquer path não coberto
+// continua negado pela ausência de regra. Isso nunca pode ser afrouxado
+// para destravar desenvolvimento local — o emulador roda contra o mesmo
+// arquivo que vai para produção.
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
+
+    // Ponto único de isolamento (D-25). Ainda sem consumidor nesta task —
+    // os planos 01-02 e 01-03 dependem dela para as subcoleções do
+    // workspace (categories, transactions, etc.).
+    function isMember(wsId) {
+      return request.auth != null &&
+        request.auth.uid in
+          get(/databases/$(database)/documents/workspaces/$(wsId)).data.memberIds;
+    }
+
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.workspaceId is string;
+
+      // workspaceId é imutável depois de criado (AUTH-01 concurrency).
+      allow update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.workspaceId == resource.data.workspaceId;
+
+      allow delete: if false;
+    }
+
+    match /workspaces/{workspaceId} {
+      allow read: if request.auth != null
+        && request.auth.uid in resource.data.memberIds;
+
+      allow create: if request.auth != null
+        && request.resource.data.memberIds == [request.auth.uid]
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0;
+
+      // Só a atualização normal por membro já existente (ex.: renomear o
+      // espaço) — memberIds não pode mudar por este caminho. A entrada por
+      // convite (acrescentar um novo uid) é assunto do plano 01-02.
+      allow update: if request.auth != null
+        && request.auth.uid in resource.data.memberIds
+        && request.resource.data.memberIds == resource.data.memberIds;
+
+      allow delete: if false;
     }
   }
 }
