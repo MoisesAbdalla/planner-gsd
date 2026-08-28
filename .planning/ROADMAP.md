@@ -65,7 +65,16 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Um usuário logado em outro espaço não consegue ler nem gravar nada no primeiro espaço — verificado com dois espaços de verdade, não com um só
   4. No primeiro acesso já existem categorias padrão em português; o usuário cria, renomeia, muda a cor e arquiva categorias sem perder o que já foi lançado nelas
   5. Toda tela do app funciona no celular e no desktop sem rolagem horizontal, com textos em pt-BR e valores em R$
-**Plans**: TBD
+**Plans**: 6 plans em 4 waves
+
+Plans:
+- [ ] 01-01-PLAN.md — Fatia tracer: scaffold, emulador, regras base e o caminho login → espaço → tela (wave 1)
+- [ ] 01-02-PLAN.md — Convite sem backend: `/invites/{token}`, prova de posse do token e resgate transacional (wave 2)
+- [ ] 01-03-PLAN.md — Linguagem visual e shell: tokens claro/escuro, navegação, menu do avatar, entrar e sair (wave 2)
+- [ ] 01-04-PLAN.md — Categorias como dado: regra, seeding idempotente das 12 e camada reativa (wave 3)
+- [ ] 01-05-PLAN.md — Convite na tela: diálogo de compartilhar e entrada pelo link com as três falhas (wave 4)
+- [ ] 01-06-PLAN.md — Categorias na tela: lista, criar/editar com a paleta fixa e arquivar (wave 4)
+
 **UI hint**: yes
 
 **Notas de fase:**
@@ -182,7 +191,7 @@ Fases 1 → 2 → 3 → 4 → 5 na trilha financeira. A Fase 6 entra em paralelo
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Acesso e espaço compartilhado | 0/TBD | Not started | - |
+| 1. Acesso e espaço compartilhado | 0/6 | Planned | - |
 | 2. Lançar e ver o mês | 0/TBD | Not started | - |
 | 3. Cartão, fatura e parcelamento | 0/TBD | Not started | - |
 | 4. Contas fixas e teto por categoria | 0/TBD | Not started | - |
