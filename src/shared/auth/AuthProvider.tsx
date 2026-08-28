@@ -12,7 +12,12 @@ import {
 import { getRedirectResult, onAuthStateChanged, type User } from 'firebase/auth'
 import { auth } from '../firebase/client'
 
-export type AuthStatus = 'loading' | 'signed-out' | 'signed-in'
+// 'error' (plano 01-03): falha de REDE na inicialização do próprio
+// listener de sessão (onAuthStateChanged nunca dispara com sucesso) —
+// distinto de uma tentativa de login que falha (essa fica só na tela de
+// entrar, E1/error, sem promover o status global). UI-SPEC E7/error: nunca
+// um shell vazio, sempre a tela de erro genérica com ação de repetir.
+export type AuthStatus = 'loading' | 'signed-out' | 'signed-in' | 'error'
 
 type AuthContextValue = {
   status: AuthStatus
@@ -26,17 +31,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
-    // Erros aqui não bloqueiam onAuthStateChanged, que é a fonte real do
-    // estado de sessão — um toast de "Falha no login do Google" cobre isso
-    // na tela de entrada (fora do escopo desta task mínima).
+    // Erro do PRÓPRIO signInWithRedirect (ex.: popup bloqueado, conta
+    // recusada) não bloqueia onAuthStateChanged, que é a fonte real do
+    // estado de sessão — a tela de entrar mostra o banner de erro (E1/error,
+    // plano 01-03), sem promover o AuthStatus global.
     getRedirectResult(auth).catch(() => {
-      /* tratado pela tela de sign-in a partir do plano 01-04 */
+      /* tratado pela tela de entrar (src/app/routes/entrar.tsx) */
     })
 
-    const unsubscribe = onAuthStateChanged(auth, (nextUser) => {
-      setUser(nextUser)
-      setStatus(nextUser ? 'signed-in' : 'signed-out')
-    })
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (nextUser) => {
+        setUser(nextUser)
+        setStatus(nextUser ? 'signed-in' : 'signed-out')
+      },
+      () => {
+        // Callback de erro do onAuthStateChanged — falha de rede real na
+        // inicialização, não um caso de "sem sessão" (esse é sucesso com
+        // user=null). E7/error: BootErrorScreen assume a partir daqui.
+        setStatus('error')
+      },
+    )
 
     return unsubscribe
   }, [])

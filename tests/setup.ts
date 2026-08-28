@@ -25,3 +25,7 @@ if (!Element.prototype.releasePointerCapture) {
 if (!Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = () => {}
 }
+// TanStack Router chama window.scrollTo() na restauração de scroll — jsdom
+// tem a função mas loga "Not implemented" (ruído, não falha); sobrescrita
+// incondicional porque o stub do jsdom existe, só não faz nada de útil.
+window.scrollTo = () => {}

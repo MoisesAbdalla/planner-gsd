@@ -30,4 +30,15 @@ export default defineConfig([
       'react-refresh/only-export-components': 'off',
     },
   },
+  {
+    // src/app/router.tsx exporta `router` (const) e `AppRoot` (componente)
+    // lado a lado — contrato fixo do bloco <interfaces> do plano 01-03,
+    // consumido pelos planos 01-05/01-06. src/app/routes/*.tsx colocam o
+    // schema de search params (ex.: entrarSearchSchema) junto da tela que
+    // ele valida, padrão comum em código de rota do TanStack Router.
+    files: ['src/app/router.tsx', 'src/app/routes/**/*.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ])

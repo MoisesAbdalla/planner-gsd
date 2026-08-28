@@ -3,6 +3,11 @@
 // UI-SPEC §App Shell): abaixo, barra superior fina + barra de navegação
 // fixa embaixo; a partir dali, rail lateral fixo de 240px substitui as
 // duas. Nunca as duas superfícies ao mesmo tempo.
+//
+// Nome do espaço + avatar aparecem em DOIS lugares no código (aqui, na
+// barra mobile, e dentro de SideRail para o desktop) porque são duas
+// superfícies visuais distintas, não uma condicionada via CSS só — cada
+// uma tem seu próprio layout (linha vs. coluna) e contexto de toque.
 import type { ReactNode } from 'react'
 
 import { WorkspaceNameField } from '@/shared/workspace/WorkspaceNameField'
