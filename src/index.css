@@ -155,6 +155,25 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Cor de categoria (D-10, plano 01-06): ao contrário dos tokens acima, o
+   valor vem de DADO (o campo `color` do documento Firestore aponta para uma
+   entrada de CATEGORY_COLOR_TOKENS em src/shared/theme/tokens.ts), não de
+   um token estático deste bloco @theme — por isso não pode virar uma classe
+   Tailwind fixa. Mesmo mecanismo de troca por tema (prefers-color-scheme),
+   só que resolvido por ELEMENTO via duas custom properties inline
+   (--cc-light/--cc-dark), no mesmo padrão já usado por
+   src/shared/ui/sonner.tsx (style prop com custom properties do CSS). Todo
+   ponto de cor de categoria (CategoryRow) e swatch da grade
+   (CategoryColorGrid) usa o atributo [data-category-swatch]. */
+[data-category-swatch] {
+  background-color: var(--cc-light);
+}
+@media (prefers-color-scheme: dark) {
+  [data-category-swatch] {
+    background-color: var(--cc-dark);
+  }
+}
+
 /* Movimento reduzido (UI-SPEC §Accessibility): transições já são curtas por
    padrão (150-200ms, mandato de calma D-15); com prefers-reduced-motion,
    qualquer animação de entrada de diálogo/sheet (tw-animate-css:
