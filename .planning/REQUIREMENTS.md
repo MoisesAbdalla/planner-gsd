@@ -142,17 +142,83 @@ Excluído explicitamente, com o motivo, para impedir que volte por inércia.
 
 ## Traceability
 
-Preenchido durante a criação do roadmap.
+Preenchido durante a criação do roadmap (2026-08-27).
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (a mapear) | — | Pending |
+| PLAT-01 | Phase 1 | Pending |
+| PLAT-02 | Phase 1 | Pending |
+| PLAT-03 | Phase 3 | Pending |
+| PLAT-04 | Phase 2 | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| AUTH-05 | Phase 1 | Pending |
+| AUTH-06 | Phase 1 | Pending |
+| AUTH-07 | Phase 1 | Pending |
+| CAT-01 | Phase 1 | Pending |
+| CAT-02 | Phase 1 | Pending |
+| CAT-03 | Phase 1 | Pending |
+| CAT-04 | Phase 1 | Pending |
+| LANC-01 | Phase 2 | Pending |
+| LANC-02 | Phase 2 | Pending |
+| LANC-03 | Phase 2 | Pending |
+| LANC-04 | Phase 2 | Pending |
+| LANC-05 | Phase 2 | Pending |
+| MES-01 | Phase 2 | Pending |
+| MES-02 | Phase 2 | Pending |
+| MES-03 | Phase 2 | Pending |
+| MES-04 | Phase 2 | Pending |
+| CART-01 | Phase 3 | Pending |
+| CART-02 | Phase 3 | Pending |
+| CART-03 | Phase 3 | Pending |
+| CART-04 | Phase 3 | Pending |
+| CART-05 | Phase 3 | Pending |
+| CART-06 | Phase 3 | Pending |
+| CART-07 | Phase 3 | Pending |
+| FIXA-01 | Phase 4 | Pending |
+| FIXA-02 | Phase 4 | Pending |
+| FIXA-03 | Phase 4 | Pending |
+| FIXA-04 | Phase 4 | Pending |
+| FIXA-05 | Phase 4 | Pending |
+| FIXA-06 | Phase 4 | Pending |
+| ORCA-01 | Phase 4 | Pending |
+| ORCA-02 | Phase 4 | Pending |
+| ORCA-03 | Phase 4 | Pending |
+| IA-01 | Phase 5 | Pending |
+| IA-02 | Phase 5 | Pending |
+| IA-03 | Phase 5 | Pending |
+| IA-04 | Phase 5 | Pending |
+| IA-05 | Phase 5 | Pending |
+| IA-06 | Phase 5 | Pending |
+| IA-07 | Phase 5 | Pending |
+| IA-08 | Phase 5 | Pending |
+| TAR-01 | Phase 6 | Pending |
+| TAR-02 | Phase 6 | Pending |
+| TAR-03 | Phase 6 | Pending |
+| TAR-04 | Phase 6 | Pending |
+| TAR-05 | Phase 6 | Pending |
+| TAR-06 | Phase 6 | Pending |
+| TAR-07 | Phase 6 | Pending |
+| TAR-08 | Phase 6 | Pending |
 
 **Coverage:**
 - v1 requirements: 56 total
-- Mapped to phases: 0 (roadmap ainda não criado)
-- Unmapped: 56 ⚠️
+- Mapped to phases: 56
+- Unmapped: 0
+
+**Por fase:**
+
+| Fase | Requisitos | Qtd |
+|------|-----------|-----|
+| Phase 1 — Acesso e espaço compartilhado | AUTH-01..07, CAT-01..04, PLAT-01, PLAT-02 | 13 |
+| Phase 2 — Lançar e ver o mês | LANC-01..05, MES-01..04, PLAT-04 | 10 |
+| Phase 3 — Cartão, fatura e parcelamento | CART-01..07, PLAT-03 | 8 |
+| Phase 4 — Contas fixas e teto por categoria | FIXA-01..06, ORCA-01..03 | 9 |
+| Phase 5 — Assistente de IA | IA-01..08 | 8 |
+| Phase 6 — Módulo Tarefas | TAR-01..08 | 8 |
 
 ---
 *Requirements defined: 2026-08-27*
-*Last updated: 2026-08-27 after initial definition*
+*Last updated: 2026-08-27 — traceability preenchida na criação do ROADMAP.md*
