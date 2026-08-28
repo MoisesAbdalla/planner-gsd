@@ -69,12 +69,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. No primeiro acesso já existem categorias padrão em português; o usuário cria, renomeia, muda a cor e arquiva categorias sem perder o que já foi lançado nelas
   5. Toda tela do app funciona no celular e no desktop sem rolagem horizontal, com textos em pt-BR e valores em R$
 
-**Plans**: 6 plans em 4 waves
+**Plans**: 1/6 plans executed em 4 waves
 
 Plans:
 **Wave 1**
 
-- [ ] 01-01-PLAN.md — Fatia tracer: scaffold, emulador, regras base e o caminho login → espaço → tela (wave 1)
+- [x] 01-01-PLAN.md — Fatia tracer: scaffold, emulador, regras base e o caminho login → espaço → tela (wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -232,7 +232,7 @@ Fases 1 → 2 → 3 → 4 → 5 na trilha financeira. A Fase 6 entra em paralelo
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Acesso e espaço compartilhado | 0/6 | Planned | - |
+| 1. Acesso e espaço compartilhado | 1/6 | In Progress|  |
 | 2. Lançar e ver o mês | 0/TBD | Not started | - |
 | 3. Cartão, fatura e parcelamento | 0/TBD | Not started | - |
 | 4. Contas fixas e teto por categoria | 0/TBD | Not started | - |

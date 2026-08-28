@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 current_phase: 1
 current_phase_name: Acesso e espaço compartilhado
 status: executing
-stopped_at: Phase 1 UI-SPEC approved
-last_updated: "2026-08-28T05:44:04.405Z"
-last_activity: 2026-08-27
+stopped_at: Completed 01-01-PLAN.md (Task 3 + checkpoint resolvido)
+last_updated: "2026-08-28T12:25:57.817Z"
+last_activity: 2026-08-28
 last_activity_desc: ROADMAP.md criado, 56/56 requisitos v1 mapeados
-state_head: 820b41a1540bc44287bf498a85daaa5f1e7e63c0
+state_head: 7ce5e9c27efc518eda3aedeefe1b2677725f2d79
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 6
-  completed_plans: 0
+  completed_plans: 1
   percent: 0
 ---
 
@@ -27,12 +27,12 @@ See: .planning/PROJECT.md (atualizado 2026-08-27)
 
 ## Current Position
 
-Phase: 1 (Acesso e espaço compartilhado) — READY TO EXECUTE
-Plan: 0 de TBD na fase atual
-Status: Ready to execute
-Last activity: 2026-08-27 — ROADMAP.md criado, 56/56 requisitos v1 mapeados
+Phase: 1 (Acesso e espaço compartilhado) — EXECUTING
+Plan: 1 de 6 na fase atual (01-01 completo)
+Status: Executing
+Last activity: 2026-08-28 — Plano 01-01 completo (fatia tracer: login Google, bootstrap de workspace, isolamento por membership)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [░░░░░░░░░░] 0% (fases completas; 1 de 6 planos da Fase 1 concluído)
 
 ## Performance Metrics
 
@@ -54,6 +54,11 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: —
 
 *Updated after each plan completion*
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 01 P01 | 50min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -66,6 +71,8 @@ Decisões completas em PROJECT.md (Key Decisions). Recentes que afetam o trabalh
 - [Roadmap]: Gasto do cartão conta no mês da compra — cada parcela pertence ao mês em que cai.
 - [Roadmap]: Cartão/parcelamento posicionado na Fase 3 (meio do roadmap) por ser o maior risco técnico; errar tarde invalida todo número já lançado.
 - [Roadmap]: Tarefas (Fase 6) depende só da Fase 1 e é paralelizável com as fases 2–5.
+- [Phase 1]: Checkpoint 01-01 Task 2 resolvido: memberIds: string[] em /workspaces/{id} (não subcoleção) — decisão de sentido único herdada pelas Security Rules das fases 2-6
+- [Phase 1]: vitest.config.ts: fileParallelism false no projeto node — arquivos de teste contra o Firestore Emulator compartilham o mesmo projectId e corrompem estado se rodarem em paralelo
 
 ### Pending Todos
 
@@ -87,6 +94,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-08-28T02:38:47.870Z
-Stopped at: Phase 1 UI-SPEC approved
-Resume file: .planning/phases/01-acesso-e-espa-o-compartilhado/01-UI-SPEC.md
+Last session: 2026-08-28T12:25:57.802Z
+Stopped at: Completed 01-01-PLAN.md (Task 3 + checkpoint resolvido)
+Resume file: None
