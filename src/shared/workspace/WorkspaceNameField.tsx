@@ -28,6 +28,21 @@ export function WorkspaceNameField({ className }: { className?: string }) {
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  // WR-03: guarda de reentrância para commit(). `saving` (estado React) não
+  // serve para isso — o handler de onBlur do <input> ainda visível captura o
+  // valor de `saving` do render em que foi criado, então checá-lo dentro de
+  // commit() não veria a mudança feita pela PRIMEIRA chamada até o próximo
+  // render. Um `useRef` é mutável e lido por referência, então reflete
+  // "existe um commit em voo" mesmo antes de qualquer re-render:
+  // handleKeyDown no Enter chama commit(), que faz setSaving(true) de forma
+  // síncrona antes do primeiro await; como o componente troca de subárvore
+  // (spinner no lugar do <input>) assim que saving=true, remover o <input>
+  // ainda focado dispara blur/focusout de forma síncrona em navegador real
+  // (jsdom não reproduz isso — daí este bug escapar de tests/shell.test.tsx
+  // originalmente), e o onBlur reentraria em commit() com o mesmo valor
+  // antes do primeiro updateDoc resolver, disparando uma escrita duplicada.
+  const committingRef = useRef(false)
+
   useEffect(() => {
     if (editing) inputRef.current?.focus()
   }, [editing])
@@ -40,7 +55,7 @@ export function WorkspaceNameField({ className }: { className?: string }) {
   }
 
   async function commit(value: string) {
-    if (!workspace) return
+    if (!workspace || committingRef.current) return
     const trimmed = value.trim()
 
     if (!trimmed) {
@@ -53,6 +68,7 @@ export function WorkspaceNameField({ className }: { className?: string }) {
       return
     }
 
+    committingRef.current = true
     setSaving(true)
     setError(null)
     try {
@@ -67,6 +83,7 @@ export function WorkspaceNameField({ className }: { className?: string }) {
         action: { label: RETRY_LABEL, onClick: () => void commit(trimmed) },
       })
     } finally {
+      committingRef.current = false
       setSaving(false)
     }
   }
