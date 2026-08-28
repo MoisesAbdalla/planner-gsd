@@ -176,6 +176,8 @@ Voz: informal, calorosa, pt-BR — "é um app de duas pessoas dividindo a vida, 
 |---|---|
 | Convite expirado | Título: "Esse link não é mais válido." Corpo: "Convites duram 7 dias por segurança. Peça para quem te convidou gerar um link novo." |
 | Convite já usado | Título: "Esse convite já foi usado." Corpo: "Cada link serve para uma entrada só. Peça um link novo para continuar." |
+| Já pertence a outro espaço | Título: "Você já faz parte de um espaço." Corpo: "Por enquanto cada pessoa participa de um espaço só. Se quiser entrar neste, fale com quem te convidou." |
+| Falha ao salvar (toast global) | "Não deu para salvar. Tenta de novo?" + ação "Tentar de novo" no próprio toast — mesma cópia para categoria, nome do espaço e geração de convite |
 | Falha no login do Google | "Não deu para entrar com o Google agora. Tenta de novo em instantes." |
 | Confirmar saída da conta | "Sair da conta? Você pode entrar de novo quando quiser — nada muda no espaço." Botões: "Sair" / "Cancelar" (estilo neutro — sair não apaga nada, D-22) |
 | Nome de categoria vazio | "Dá um nome para a categoria." |
@@ -187,29 +189,99 @@ Voz: informal, calorosa, pt-BR — "é um app de duas pessoas dividindo a vida, 
 
 ## UI Considerations
 
-> Populada pelo probe de consideração de UI (Step 9.5), taxonomia de 8 categorias sobre estado
-> de elemento (empty/loading/error/populated/partial/overflow/zero-one-many/long-text). Cópia de
-> empty/error vive na seção Copywriting Contract acima — aqui cobrimos cobertura de estado e
-> referenciamos essas linhas em vez de repetir o texto.
+> Gerada pelo probe de consideração de UI (`ui-consideration-probe.cjs`, Step 9.5) após a aprovação
+> do checker. Taxonomia de 8 categorias sobre estado de elemento
+> (empty/loading/error/populated/partial/overflow/zero-one-many/long-text), aplicada aos 7
+> elementos/superfícies descritos nas seções App Shell e Screens.
+>
+> A cópia de empty/error vive em **Copywriting Contract** — aqui cobrimos *cobertura de estado* e
+> referenciamos aquelas linhas em vez de repetir o texto.
+>
+> **Nota de classificação:** a heurística de prosa do motor classificou mal 6 dos 7 elementos
+> (3 vieram `unclassified`, a lista de categorias veio como `interactive-control` e a tela de login
+> como `list-collection`). Os `elements` foram sobrescritos manualmente com os tipos corretos e o
+> motor foi re-executado — 35 considerações aplicáveis, zero `unclassified`.
 
-Applicable state considerations resolved: 7 covered, 3 backstop, 1 unresolved
+**Cobertura:** 35 aplicáveis — 22 `resolved` (explicit) · 9 `resolved` (backstop) · 4 `dismissed` · 0 `unresolved`
 
-| Category | Element(s) | Status | Resolution / Reason |
-|----------|------------|--------|---------------------|
-| empty | category-list (list-collection) | ✅ covered | O espaço sempre nasce com 12 categorias (D-09) e "Outros" não pode ser arquivada — a lista nunca fica vazia no uso normal; copy defensiva de fallback definida em Copywriting Contract (Empty state) |
-| loading | sign-in (interactive-control) | ✅ covered | Botão "Entrar com o Google" mostra spinner e fica desabilitado durante o popup/redirect |
-| error | sign-in (interactive-control) | ✅ covered | Banner inline usa a copy "Falha no login do Google" (Copywriting Contract) |
-| error | invite-join-flow (nav) | ✅ covered | Estados de convite expirado e convite já usado com copy dedicada (Copywriting Contract) |
-| loading | invite-share (interactive-control) | ✅ covered | Diálogo mostra estado de carregamento breve enquanto o código é gerado, antes do link aparecer |
-| overflow | invite-join-flow (nav) | ⚠ unresolved | Comportamento de um usuário que já pertence a um espaço abrindo o link de convite de *outro* espaço não está definido nesta fase — decisão de produto/dado a fechar em `/gsd-plan-phase`, não de UI |
-| populated | category-list (list-collection) | ✅ covered | Linha = ponto de cor + nome; arquivadas esmaecidas e agrupadas atrás de um toggle "Mostrar arquivadas" (ver Screens item 5) |
-| zero-one-many | category-list (list-collection) | 🧪 backstop | Lista deve rolar verticalmente sem quebrar o layout do shell com volume alto de categorias (12 padrão + criadas pelo usuário) — verificar com teste visual simulando 20+ categorias |
-| long-text | category-list (list-collection) | 🧪 backstop | Nome de categoria muito longo trunca com reticências na própria linha, nunca força rolagem horizontal (PLAT-02) — verificar com teste visual usando nome de 40+ caracteres |
-| long-text | space-name-header (static-content / interactive-control) | 🧪 backstop | Nome do espaço muito longo trunca com reticências no cabeçalho/rail sem empurrar o avatar para fora da área visível — verificar com teste visual |
-| form | category-create-edit-form (form) | ✅ covered | Validação de nome vazio e nome duplicado com copy dedicada (Copywriting Contract) |
-| partial | category-create-edit-form (form) | ✅ covered | Cor é campo obrigatório com valor pré-selecionado (primeira cor livre da paleta) — o formulário nunca fica num estado sem cor válida selecionada |
+### E1 — Tela de entrar (`form`, `interactive-control`)
 
----
+| Category | Status | Resolution |
+|---|---|---|
+| empty | ✅ explicit | Não há campos a preencher — o estado inicial é o card com o botão "Entrar com o Google" habilitado. Estado vazio não é alcançável. |
+| loading | ✅ explicit | O botão vira spinner e fica desabilitado enquanto o popup/redirect do Google resolve (Screens 1). |
+| error | ✅ explicit | Banner inline abaixo do botão, cópia "Falha no login do Google" (Copywriting Contract). |
+| partial | ✅ explicit | Não há preenchimento parcial possível — a única entrada é o botão de OAuth. |
+| long-text | 🧪 backstop | Nome do app e a frase de privacidade são strings fixas; teste visual confirma que não quebram o card a 320px de largura. |
+
+### E2 — Diálogo de convidar alguém (`interactive-control`, `static-content`)
+
+| Category | Status | Resolution |
+|---|---|---|
+| loading | ✅ explicit | Spinner ocupa o lugar do campo de link enquanto o código de convite é gerado (Screens 3). |
+| error | ✅ explicit | Falha ao gerar o convite dispara toast com ação "tentar de novo" (padrão global de falha de gravação). |
+| overflow | 🧪 backstop | O campo somente-leitura do link trunca ou rola horizontalmente **dentro do próprio campo** — nunca estoura o diálogo nem provoca rolagem horizontal na página (PLAT-02). Teste visual com URL longa. |
+| long-text | 🧪 backstop | Mesmo campo, mesmo teste — URL de convite longa não empurra os botões "Compartilhar" e "Copiar link" para fora. |
+
+### E3 — Entrada por link de convite (`nav`)
+
+| Category | Status | Resolution |
+|---|---|---|
+| loading | ✅ explicit | Spinner em tela cheia enquanto o código é validado contra a Security Rule, depois de autenticar e antes de entrar no shell. |
+| error | ✅ explicit | Três estados de falha, todos em tela cheia (não há shell ainda): convite expirado, convite já usado, e **usuário já pertence a um espaço** (ver linha nova no Copywriting Contract). |
+| overflow | ⊘ dismissed | A tela de falha contém no máximo título, corpo curto e um botão — não há conteúdo capaz de exceder o container. |
+| long-text | 🧪 backstop | Strings fixas; teste visual a 320px. |
+
+### E4 — Lista de categorias (`list-collection`)
+
+| Category | Status | Resolution |
+|---|---|---|
+| empty | ✅ explicit | Cópia defensiva definida (Copywriting Contract). Na prática inalcançável: o espaço nasce com 12 categorias (D-09) e "Outros" não pode ser arquivada. |
+| loading | ✅ explicit | Spinner central enquanto as categorias carregam do Firestore. |
+| error | ✅ explicit | Falha ao carregar dispara toast com "tentar de novo". |
+| populated | ✅ explicit | Cada linha: ponto de cor + nome + editar + arquivar (Screens 5). |
+| partial | ✅ explicit | Arquivadas aparecem esmaecidas e agrupadas ao final, atrás do toggle "Mostrar arquivadas" (fechado por padrão). |
+| overflow | 🧪 backstop | A lista rola verticalmente sem quebrar o shell. Teste visual com 20+ categorias. |
+| zero-one-many | 🧪 backstop | Layout legível em 0, 1 e muitas categorias — sem cópia no plural que quebre no singular. Teste visual nos três volumes. |
+
+### E5 — Formulário de criar/editar categoria (`form`)
+
+| Category | Status | Resolution |
+|---|---|---|
+| empty | ✅ explicit | Validação inline de nome vazio: "Dá um nome para a categoria." (Copywriting Contract). |
+| loading | ✅ explicit | O botão "Criar categoria" / "Salvar alterações" vira spinner e desabilita durante a gravação. |
+| error | ✅ explicit | Falha na gravação dispara toast com "tentar de novo"; o formulário permanece aberto com os valores digitados. |
+| partial | ✅ explicit | Cor é obrigatória mas já vem pré-selecionada (primeira cor livre da paleta) — o formulário nunca fica sem cor válida. Nome duplicado tem cópia própria. |
+| long-text | 🧪 backstop | Nome de 40+ caracteres não estoura o campo nem o diálogo. Teste visual. |
+
+### E6 — Nome do espaço no cabeçalho (`form`, `static-content`)
+
+| Category | Status | Resolution |
+|---|---|---|
+| empty | ✅ explicit | Não aceita nome vazio: "O espaço precisa de um nome." (Copywriting Contract). |
+| loading | ✅ explicit | Spinner pequeno no lugar do input durante a gravação da edição inline. |
+| error | ✅ explicit | Falha dispara toast com "tentar de novo" e o nome **volta ao valor anterior** — nunca fica exibindo um valor que não foi gravado. |
+| partial | ⊘ dismissed | Campo único — não existe estado parcial entre "vazio" e "preenchido". |
+| overflow | 🧪 backstop | Nome longo trunca com reticências no cabeçalho e no rail, sem empurrar o avatar para fora da área visível. Teste visual. |
+| long-text | 🧪 backstop | Mesmo teste, no modo de edição: o input não expande além da barra. |
+
+### E7 — Shell de navegação (`nav`)
+
+| Category | Status | Resolution |
+|---|---|---|
+| loading | ✅ explicit | **Logo centralizada em tela cheia** enquanto o Firebase Auth resolve se há sessão, antes de decidir entre login e shell. É o primeiro frame de toda abertura do app. |
+| error | ✅ explicit | Falha de rede na inicialização cai na tela de erro genérica com ação de repetir, em vez de shell vazio. |
+| overflow | ⊘ dismissed | Exatamente 2 destinos fixos (Financeiro, Tarefas) — a barra não tem como transbordar. |
+| long-text | ⊘ dismissed | Labels são strings fixas e curtas definidas aqui, não conteúdo do usuário. |
+
+### Decisões transversais tomadas nesta rodada
+
+Cada uma fecha várias considerações de uma vez e vale para todas as fases seguintes:
+
+- **Abertura do app:** logo centralizada em tela cheia enquanto a sessão resolve.
+- **Falha de gravação:** sempre **toast com ação "tentar de novo"**, em qualquer superfície (categoria, nome do espaço, geração de convite). Não é mensagem inline por tela, e não é atualização otimista — o valor exibido só muda depois que a gravação confirma.
+- **Espera:** **spinner** em listas e formulários (botão de salvar vira spinner e desabilita). Skeleton foi considerado e recusado em favor de simplicidade.
+- **Convite de outro espaço:** quem já pertence a um espaço e abre o link de outro é **recusado com explicação** — a v1 é uma pessoa, um espaço. Isso fecha a lacuna que o pesquisador havia deixado aberta e mantém "sair do espaço" fora do escopo (ver PROJECT.md Out of Scope).
 
 ## Accessibility
 
