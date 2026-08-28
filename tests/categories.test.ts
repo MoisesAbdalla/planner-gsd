@@ -31,6 +31,9 @@ const { CATEGORY_COLOR_ORDER, CATEGORY_COLOR_TOKENS } = await import('../src/sha
 const { DEFAULT_CATEGORIES } = await import('../src/modules/categories/data/defaults')
 const { categoriesCollection } = await import('../src/modules/categories/data/refs')
 const { seedDefaultCategories } = await import('../src/modules/categories/data/seed')
+const { createCategory, updateCategory, archiveCategory } = await import(
+  '../src/modules/categories/hooks/useCategoryMutations'
+)
 
 let testEnv: RulesTestEnvironment
 
@@ -271,5 +274,164 @@ describe('seedDefaultCategories (CAT-01)', () => {
 
     const snap = await getDocs(categoriesCollection('wsA'))
     expect(snap.size).toBe(12)
+  })
+})
+
+describe('createCategory / updateCategory / archiveCategory (CAT-02, CAT-03, CAT-04)', () => {
+  test('createCategory cria isSystemDefault=false, canArchive=true, archivedAt=null e devolve o id gerado', async () => {
+    await seedWorkspace('wsA', 'alice')
+    activeDb = testEnv.authenticatedContext('alice').firestore()
+
+    const id = await createCategory('wsA', { name: 'Farmácia', color: 'saude' })
+    expect(typeof id).toBe('string')
+    expect(id.length).toBeGreaterThan(0)
+
+    const snap = await getDocs(categoriesCollection('wsA'))
+    const created = snap.docs.find((d) => d.id === id)!.data()
+    expect(created.name).toBe('Farmácia')
+    expect(created.color).toBe('saude')
+    expect(created.isSystemDefault).toBe(false)
+    expect(created.canArchive).toBe(true)
+    expect(created.archivedAt).toBeNull()
+  })
+
+  test('updateCategory altera só o nome e mantém color/isSystemDefault/canArchive/createdAt intactos', async () => {
+    await seedWorkspace('wsA', 'alice')
+    activeDb = testEnv.authenticatedContext('alice').firestore()
+
+    const id = await createCategory('wsA', { name: 'Farmácia', color: 'saude' })
+    const beforeSnap = await getDocs(categoriesCollection('wsA'))
+    const before = beforeSnap.docs.find((d) => d.id === id)!.data()
+
+    await updateCategory('wsA', id, { name: 'Farmácia e drogaria' })
+
+    const afterSnap = await getDocs(categoriesCollection('wsA'))
+    const after = afterSnap.docs.find((d) => d.id === id)!.data()
+    expect(after.name).toBe('Farmácia e drogaria')
+    expect(after.color).toBe(before.color)
+    expect(after.isSystemDefault).toBe(before.isSystemDefault)
+    expect(after.canArchive).toBe(before.canArchive)
+    expect((after.createdAt as Timestamp).isEqual(before.createdAt as Timestamp)).toBe(true)
+  })
+
+  test('updateCategory altera só a cor', async () => {
+    await seedWorkspace('wsA', 'alice')
+    activeDb = testEnv.authenticatedContext('alice').firestore()
+
+    const id = await createCategory('wsA', { name: 'Farmácia', color: 'saude' })
+    await updateCategory('wsA', id, { color: 'lazer' })
+
+    const snap = await getDocs(categoriesCollection('wsA'))
+    const after = snap.docs.find((d) => d.id === id)!.data()
+    expect(after.color).toBe('lazer')
+    expect(after.name).toBe('Farmácia')
+  })
+
+  test('archiveCategory define archivedAt e o documento continua existindo na subcoleção (CAT-04)', async () => {
+    await seedWorkspace('wsA', 'alice')
+    activeDb = testEnv.authenticatedContext('alice').firestore()
+
+    const id = await createCategory('wsA', { name: 'Farmácia', color: 'saude' })
+    await archiveCategory('wsA', id)
+
+    const snap = await getDocs(categoriesCollection('wsA'))
+    const after = snap.docs.find((d) => d.id === id)
+    expect(after).toBeDefined()
+    expect(after!.data().archivedAt).not.toBeNull()
+  })
+
+  test('archiveCategory chamado duas vezes seguidas não lança e deixa o documento arquivado (CAT-04 idempotency)', async () => {
+    await seedWorkspace('wsA', 'alice')
+    activeDb = testEnv.authenticatedContext('alice').firestore()
+
+    const id = await createCategory('wsA', { name: 'Farmácia', color: 'saude' })
+    await archiveCategory('wsA', id)
+    await expect(archiveCategory('wsA', id)).resolves.toBeUndefined()
+
+    const snap = await getDocs(categoriesCollection('wsA'))
+    const after = snap.docs.find((d) => d.id === id)!.data()
+    expect(after.archivedAt).not.toBeNull()
+  })
+
+  test('archiveCategory rejeita para outros — a regra nega (defesa em profundidade)', async () => {
+    await seedWorkspace('wsA', 'alice')
+    activeDb = testEnv.authenticatedContext('alice').firestore()
+    await seedDefaultCategories('wsA')
+
+    await expect(archiveCategory('wsA', 'outros')).rejects.toBeDefined()
+  })
+
+  test('duas chamadas de createCategory sem aguardar uma pela outra produzem dois documentos distintos (AUTH-06 concurrency)', async () => {
+    await seedWorkspace('wsA', 'alice')
+    activeDb = testEnv.authenticatedContext('alice').firestore()
+
+    const [idA, idB] = await Promise.all([
+      createCategory('wsA', { name: 'Farmácia', color: 'saude' }),
+      createCategory('wsA', { name: 'Streaming', color: 'assinaturas' }),
+    ])
+
+    expect(idA).not.toBe(idB)
+    const snap = await getDocs(categoriesCollection('wsA'))
+    expect(snap.docs.some((d) => d.id === idA)).toBe(true)
+    expect(snap.docs.some((d) => d.id === idB)).toBe(true)
+  })
+
+  test('salvar a mesma edição duas vezes deixa o documento no mesmo estado (CAT-03 idempotency)', async () => {
+    await seedWorkspace('wsA', 'alice')
+    activeDb = testEnv.authenticatedContext('alice').firestore()
+
+    const id = await createCategory('wsA', { name: 'Farmácia', color: 'saude' })
+    await updateCategory('wsA', id, { name: 'Farmácia e drogaria' })
+    await updateCategory('wsA', id, { name: 'Farmácia e drogaria' })
+
+    const snap = await getDocs(categoriesCollection('wsA'))
+    const after = snap.docs.find((d) => d.id === id)!.data()
+    expect(after.name).toBe('Farmácia e drogaria')
+  })
+})
+
+describe('consulta usada por useCategories — ordenação e isolamento (AUTH-06)', () => {
+  test('a query ordenada por nome devolve as categorias ordenadas por nome, e o resultado é idêntico entre duas execuções', async () => {
+    await seedWorkspace('wsA', 'alice')
+    activeDb = testEnv.authenticatedContext('alice').firestore()
+    await seedDefaultCategories('wsA')
+
+    const q = query(categoriesCollection('wsA'), orderBy('name'))
+    const firstSnap = await getDocs(q)
+    const secondSnap = await getDocs(q)
+
+    const firstNames = firstSnap.docs.map((d) => d.data().name)
+    const secondNames = secondSnap.docs.map((d) => d.data().name)
+    const sorted = [...firstNames].sort((a, b) => a.localeCompare(b, 'pt-BR'))
+
+    expect(firstNames).toEqual(sorted)
+    expect(secondNames).toEqual(firstNames)
+  })
+
+  test('duas categorias com o mesmo nome em wsA e em wsB não interferem uma na outra (AUTH-06 adjacency)', async () => {
+    await seedWorkspace('wsA', 'alice')
+    await seedWorkspace('wsB', 'bob')
+
+    activeDb = testEnv.authenticatedContext('alice').firestore()
+    const idA = await createCategory('wsA', { name: 'Assinaturas extra', color: 'assinaturas' })
+
+    activeDb = testEnv.authenticatedContext('bob').firestore()
+    const idB = await createCategory('wsB', { name: 'Assinaturas extra', color: 'assinaturas' })
+
+    // Cada leitura usa o membro correto do espaço lido: `activeDb` (o
+    // mesmo singleton que categoriesCollection() usa por baixo) precisa
+    // apontar para alice para ler wsA e para bob para ler wsB — ler wsA
+    // como bob seria negado por isMember(), que já é provado à parte em
+    // tests/firestore.rules.test.ts.
+    activeDb = testEnv.authenticatedContext('alice').firestore()
+    const snapA = await getDocs(categoriesCollection('wsA'))
+
+    activeDb = testEnv.authenticatedContext('bob').firestore()
+    const snapB = await getDocs(categoriesCollection('wsB'))
+
+    expect(snapA.docs.some((d) => d.id === idA)).toBe(true)
+    expect(snapA.docs.some((d) => d.id === idB)).toBe(false)
+    expect(snapB.docs.some((d) => d.id === idB)).toBe(true)
+    expect(snapB.docs.some((d) => d.id === idA)).toBe(false)
   })
 })
