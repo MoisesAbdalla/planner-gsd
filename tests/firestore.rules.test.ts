@@ -473,6 +473,59 @@ describe('workspace/membro não mexe na lista (AUTH-07)', () => {
   })
 })
 
+describe('WR-01: ramo de membro já existente valida o campo name (AUTH-07)', () => {
+  async function seedRenameableWorkspace() {
+    await testEnv.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), 'workspaces/wsA'), {
+        name: 'Casa A',
+        ownerId: 'alice',
+        memberIds: ['alice'],
+        createdAt: Timestamp.now(),
+      })
+    })
+  }
+
+  test('alice, membro, renomeia o espaço com um nome válido — sucesso', async () => {
+    await seedRenameableWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertSucceeds(updateDoc(doc(aliceDb, 'workspaces/wsA'), { name: 'Nosso Cantinho' }))
+  })
+
+  test('alice é negada ao renomear o espaço para string vazia', async () => {
+    await seedRenameableWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertFails(updateDoc(doc(aliceDb, 'workspaces/wsA'), { name: '' }))
+  })
+
+  test('alice é negada ao gravar name como tipo não-string', async () => {
+    await seedRenameableWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertFails(updateDoc(doc(aliceDb, 'workspaces/wsA'), { name: 123 }))
+  })
+
+  test('alice é negada ao gravar name maior que 80 caracteres', async () => {
+    await seedRenameableWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertFails(updateDoc(doc(aliceDb, 'workspaces/wsA'), { name: 'x'.repeat(81) }))
+  })
+
+  test('alice, membro já existente, é negada ao forjar ownerId na mesma escrita que mantém memberIds', async () => {
+    await seedRenameableWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertFails(
+      updateDoc(doc(aliceDb, 'workspaces/wsA'), { name: 'Casa A', ownerId: 'mallory' }),
+    )
+  })
+
+  test('alice, membro já existente, é negada ao forjar createdAt na mesma escrita', async () => {
+    await seedRenameableWorkspace()
+    const aliceDb = testEnv.authenticatedContext('alice').firestore()
+    await assertFails(
+      updateDoc(doc(aliceDb, 'workspaces/wsA'), { name: 'Casa A', createdAt: Timestamp.now() }),
+    )
+  })
+})
+
 // ---------------------------------------------------------------------
 // 01-04: categorias como dado (CAT-01..04, AUTH-06/07) — ver
 // 01-RESEARCH.md §Seeding das 12 categorias, §Arquivar vs. excluir e o

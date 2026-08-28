@@ -56,8 +56,19 @@ service cloud.firestore {
       // aberto, mesmo sem jamais ter visto o link (01-RESEARCH.md §2,
       // Pitfall 2, T-01-02 no <threat_model> do plano 01-02).
       allow update: if request.auth != null && (
+        // WR-01: ramo de "membro já existente atualizando" — só pode tocar
+        // `name` (o único campo que WorkspaceNameField grava). memberIds
+        // sem mudança + affectedKeys().hasOnly(['name']) juntos já tornam
+        // ownerId/createdAt imutáveis por este ramo sem precisar checá-los
+        // um a um: qualquer chave que mude vira uma affected key e reprova
+        // o hasOnly. Entrada de membro (memberIds crescendo) continua
+        // vivendo só no segundo ramo, abaixo.
         (request.auth.uid in resource.data.memberIds
-          && request.resource.data.memberIds == resource.data.memberIds)
+          && request.resource.data.memberIds == resource.data.memberIds
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name'])
+          && request.resource.data.name is string
+          && request.resource.data.name.size() > 0
+          && request.resource.data.name.size() <= 80)
         ||
         (
           !(request.auth.uid in resource.data.memberIds)
