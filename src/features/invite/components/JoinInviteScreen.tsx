@@ -30,7 +30,13 @@ export function JoinInviteScreen({ token, uid }: { token: string; uid: string })
       })
       .catch((error: unknown) => {
         clearPendingInviteToken()
-        setErrorCode(error instanceof JoinInviteError ? error.code : 'invite-already-used')
+        // WR-04: join.ts sempre lança JoinInviteError agora (a própria
+        // reclassificação genérica dela usa 'unknown' para o que não é a
+        // corrida de resgate concorrente confirmada) — este `: 'unknown'`
+        // é só defesa em profundidade caso algo além de joinWorkspace()
+        // lance aqui dentro (ex.: clearPendingInviteToken), nunca mais
+        // reaproveita a cópia de "convite já usado" por padrão.
+        setErrorCode(error instanceof JoinInviteError ? error.code : 'unknown')
       })
   }, [token, uid, navigate])
 

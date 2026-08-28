@@ -20,6 +20,11 @@ export type JoinInviteErrorCode =
   | 'invite-already-used'
   | 'invite-expired'
   | 'already-in-workspace'
+  // WR-04: falha genérica/não classificada (rede, permissão negada por um
+  // motivo diferente da corrida de resgate concorrente, etc.) — nunca
+  // reaproveita a cópia de 'invite-already-used' para algo que pode não
+  // ter nada a ver com o convite já ter sido usado.
+  | 'unknown'
 
 export class JoinInviteError extends Error {
   code: JoinInviteErrorCode
@@ -114,6 +119,28 @@ export async function joinWorkspace(token: string, uid: string): Promise<string>
     // interna da regra do WORKSPACE. Tratado aqui como o mesmo resultado de
     // "já usado" para quem chama; é o risco residual documentado como
     // aceito em 01-RESEARCH.md §3/§5 (T-01-08).
-    throw new JoinInviteError('invite-already-used')
+    //
+    // WR-04: essa reclassificação só vale para a FORMA especificamente
+    // confirmada acima — um FirebaseError com code 'permission-denied'.
+    // Antes, QUALQUER erro não-JoinInviteError (rede caindo, o emulador/
+    // servidor fora do ar, um bug em outro lugar) virava 'invite-already-
+    // used', mostrando a cópia errada para o usuário numa janela de corrida
+    // completamente diferente. Erros com qualquer outra forma sobem como
+    // 'unknown', que a UI renderiza com a cópia genérica de erro do
+    // Copywriting Contract — nunca inventa "já foi usado" para uma causa
+    // que pode não ter nada a ver com o convite.
+    if (isFirestorePermissionDenied(error)) {
+      throw new JoinInviteError('invite-already-used')
+    }
+    throw new JoinInviteError('unknown')
   }
+}
+
+function isFirestorePermissionDenied(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code: unknown }).code === 'permission-denied'
+  )
 }

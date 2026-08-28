@@ -247,6 +247,9 @@ describe('JoinInviteScreen (Screen 4, E3, AUTH-05, D-07)', () => {
     // invite-not-found funde com a tela de convite expirado — nunca
     // confirma nem nega a existência de um token (T-01-21).
     { code: 'invite-not-found', title: 'Esse link não é mais válido.' },
+    // WR-04: falha genérica/não classificada renderiza a cópia de erro
+    // genérica do Copywriting Contract, nunca a de "convite já foi usado".
+    { code: 'unknown', title: 'Algo não funcionou.' },
   ]
 
   for (const { code, title } of FAILURE_CASES) {
@@ -258,6 +261,19 @@ describe('JoinInviteScreen (Screen 4, E3, AUTH-05, D-07)', () => {
       expect(navigateMock).not.toHaveBeenCalled()
     })
   }
+
+  // WR-04: defesa em profundidade — se algo além de joinWorkspace() rejeitar
+  // com um erro que NÃO é JoinInviteError (ex.: clearPendingInviteToken
+  // lançando), a tela cai na cópia de erro genérica ('unknown'), nunca mais
+  // na cópia de "convite já foi usado" (que era o fallback padrão antes).
+  it('joinWorkspace rejeitando com um erro que não é JoinInviteError renderiza a tela genérica, não "convite já foi usado"', async () => {
+    joinWorkspaceMock.mockRejectedValue(new TypeError('Failed to fetch'))
+    render(<JoinInviteScreen token="tok" uid="u2" />)
+
+    expect(await screen.findByText('Algo não funcionou.')).toBeInTheDocument()
+    expect(screen.queryByText('Esse convite já foi usado.')).not.toBeInTheDocument()
+    expect(navigateMock).not.toHaveBeenCalled()
+  })
 })
 
 describe('InviteErrorScreen (Copywriting Contract, T-01-21)', () => {
@@ -287,6 +303,12 @@ describe('InviteErrorScreen (Copywriting Contract, T-01-21)', () => {
         'Por enquanto cada pessoa participa de um espaço só. Se quiser entrar neste, fale com quem te convidou.',
       ),
     ).toBeInTheDocument()
+  })
+
+  it('falha genérica/não classificada (WR-04): título e corpo exatos da cópia genérica do Copywriting Contract', () => {
+    render(<InviteErrorScreen code="unknown" />)
+    expect(screen.getByText('Algo não funcionou.')).toBeInTheDocument()
+    expect(screen.getByText('Tenta de novo?')).toBeInTheDocument()
   })
 
   it('tem um único botão de ação, que leva de volta para /entrar sem o parâmetro de convite', () => {

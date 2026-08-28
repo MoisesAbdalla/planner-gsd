@@ -31,6 +31,14 @@ const VARIANTS: Record<JoinInviteErrorCode, Variant> = {
     title: 'Você já faz parte de um espaço.',
     body: 'Por enquanto cada pessoa participa de um espaço só. Se quiser entrar neste, fale com quem te convidou.',
   },
+  // WR-04: falha genérica/não classificada — cópia de "Error state" do
+  // Copywriting Contract (01-UI-SPEC.md), verbatim, em vez de reaproveitar
+  // a cópia de invite-already-used para uma causa que pode não ter nada a
+  // ver com o convite já ter sido usado.
+  unknown: {
+    title: 'Algo não funcionou.',
+    body: 'Tenta de novo?',
+  },
 }
 
 export function InviteErrorScreen({ code }: { code: JoinInviteErrorCode }) {
