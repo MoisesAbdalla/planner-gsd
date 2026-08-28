@@ -65,6 +65,10 @@ Se o planner de tarefas falhar, ainda vale a pena. Se essa clareza financeira fa
 - [ ] Tarefas recorrentes (toda segunda, todo dia 5…)
 - [ ] Visão de semana e de mês, não só lista solta
 
+<!-- Ajustado após a pesquisa: o lembrete da v1 é dentro do app. Push real (FCM) exige função
+     agendada, que exige plano Blaze — descartado na v1 por decisão do usuário. Ver Out of Scope. -->
+
+
 ### Out of Scope
 
 - **Importar extrato bancário (Open Finance)** — exige agregador pago (Pluggy/Belvo) com cadastro e custo recorrente; adiado para v2 por custo e complexidade desproporcionais à v1
@@ -75,6 +79,10 @@ Se o planner de tarefas falhar, ainda vale a pena. Se essa clareza financeira fa
 - **Login por e-mail/senha** — Google via Firebase é suficiente e evita construir cadastro, recuperação de senha e verificação
 - **Multi-usuário público (SaaS aberto)** — o espaço é para duas pessoas conhecidas; não há onboarding, planos ou cobrança
 - **Metas de poupança e investimentos** — fora do foco: o app responde "para onde foi o dinheiro", não "onde aplicar"
+- **Cloud Functions do Firebase / plano Blaze** — o usuário optou por não cadastrar cartão no Google Cloud; o Spark não deploya funções, então a v1 vive sem elas
+- **Funções agendadas (materialização automática de meses futuros)** — consequência direta de não ter Blaze; ocorrências futuras são geradas quando o app é aberto, não por cron
+- **Notificação push (FCM)** — depende de função agendada; na v1 o lembrete é dentro do app. Também exigiria PWA instalado no iOS Safari
+- **Divisão de despesas entre as duas pessoas (settle-up)** — categoria de produto separada (Splitwise); conflita com o modelo simples de espaço compartilhado
 
 ## Context
 
@@ -106,6 +114,13 @@ Se o planner de tarefas falhar, ainda vale a pena. Se essa clareza financeira fa
 | Web responsiva em vez de app nativo | Uma base de código cobre o uso no celular e no desktop | — Pending |
 | Confirmação obrigatória antes de gravar lançamento da IA | Interpretação de linguagem natural erra; gravar às cegas destrói a confiança nos números, que são o core value | — Pending |
 | Frontend conduzido pela skill `frontend-design` | O usuário não tem referência visual e pediu explicitamente design intencional em vez de template | — Pending |
+| Firebase permanece no plano Spark (sem cartão) | Decisão do usuário após a pesquisa apontar que funções agendadas exigem Blaze; o custo real seria ~zero, mas o usuário preferiu não cadastrar cartão | — Pending |
+| Proxy da IA fora do Firebase, em serverless gratuito | Consequência do Spark: Cloud Functions não deploya sem Blaze, e a chave do LLM não pode ir para o navegador. Candidatos: Cloudflare Workers ou Vercel Hobby — decidir na fase da IA | — Pending |
+| Ocorrências futuras geradas na abertura do app | Sem cron, contas fixas e parcelas dos meses seguintes são materializadas no cliente quando o mês é acessado | — Pending |
+| Gasto do cartão contabilizado no mês da compra | O usuário pensa o gasto pelo comportamento, não pelo caixa; cada parcela pertence ao mês dela. Consequência aceita: "quanto sobra" reflete compromisso assumido, não dinheiro que saiu da conta | — Pending |
+| Entrada no espaço por código de convite | Escolha delegada a mim ("tanto faz"): não depende de e-mail conhecido de antemão e funciona sem backend, ao contrário do e-mail pré-autorizado | — Pending |
+| Vite + React SPA, não Next.js | Pesquisa: `onSnapshot` do Firestore só roda no cliente e não há superfície pública que justifique SSR — Next.js cobraria complexidade de ponte de auth sem entregar benefício | — Pending |
+| Dinheiro em centavos inteiros com Dinero.js | Float acumula erro; `allocate()` garante que a soma das parcelas feche exatamente com o total | — Pending |
 
 ## Evolution
 
