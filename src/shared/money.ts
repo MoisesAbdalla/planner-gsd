@@ -32,11 +32,14 @@ export function parseBRLToCents(input: string): number | null {
   const stripped = trimmed.replace(NOT_DIGIT_COMMA_DOT_MINUS, '')
   if (stripped === '' || stripped === '-') return null
 
-  // Formato brasileiro: '.' separa milhar, ',' separa decimal.
-  // Se houver vírgula, tratamos como decimal e removemos pontos de milhar.
-  const normalized = stripped.includes(',')
-    ? stripped.replace(LITERAL_DOT, '').replace(',', '.')
-    : stripped
+  // pt-BR não tem ponto decimal: '.' é SEMPRE separador de milhar (descartado),
+  // ',' é SEMPRE o separador decimal quando presente. Remover todos os pontos
+  // primeiro, depois tratar a vírgula (se houver) como decimal — nunca
+  // adivinhar notação inglesa a partir da ausência de vírgula (CR-01).
+  const withoutThousands = stripped.replace(LITERAL_DOT, '')
+  const normalized = withoutThousands.includes(',')
+    ? withoutThousands.replace(',', '.')
+    : withoutThousands
 
   const value = Number(normalized)
   if (!Number.isFinite(value)) return null
