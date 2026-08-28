@@ -1,21 +1,33 @@
-// Tela de entrar (UI-SPEC Screen 1). Tela cheia centralizada sobre a
-// superfície dominante, card elevado com nome do app, frase de privacidade
-// e o botão de login com o provedor Google — segue a marca própria do
-// Google, não usa accent (UI-SPEC §Color, "Accent reserved for"). Sem
-// e-mail/senha (fora de escopo, PROJECT.md).
+// Tela de entrar (UI-SPEC Screen 1) + ramo de resgate por convite (UI-SPEC
+// Screen 4, D-01, D-07, plano 01-05). O parâmetro `convite` decide entre os
+// dois: sem sessão, é SEMPRE esta mesma tela (nunca uma variante própria) —
+// só depois de autenticar é que o resgate acontece, via JoinInviteScreen.
+// Sem e-mail/senha (fora de escopo, PROJECT.md).
 //
-// O search param `convite` já é declarado aqui (schema `entrarSearchSchema`,
-// consumido por src/app/router.tsx) para a URL de convite funcionar desde
-// já — o plano 01-05 acrescenta o comportamento de resgate em cima dele;
-// esta task só declara a forma.
-import { useState } from 'react'
+// O token precisa sobreviver ao redirect do Google: é gravado em
+// sessionStorage (src/features/invite/pendingToken.ts) antes de
+// signInWithGoogle() e lido de volta aqui na reabertura, como reforço caso a
+// query string em si não sobreviva à ida-e-volta completa até
+// accounts.google.com (01-RESEARCH.md §Firebase Auth Google numa SPA). O
+// valor é apagado por JoinInviteScreen assim que o resgate resolve (sucesso
+// ou falha) — uma abertura futura do app nunca tenta resgatar de novo um
+// convite já decidido.
+import { useEffect, useState } from 'react'
 import { z } from 'zod'
 
+import { useAuth } from '@/shared/auth/AuthProvider'
 import { signInWithGoogle } from '@/shared/auth/signIn'
+import { JoinInviteScreen } from '@/features/invite/components/JoinInviteScreen'
+import { readPendingInviteToken, writePendingInviteToken } from '@/features/invite/pendingToken'
 
 export const entrarSearchSchema = z.object({
   convite: z.string().optional(),
 })
+
+function readInviteTokenFromLocation(): string | undefined {
+  if (typeof window === 'undefined') return undefined
+  return new URLSearchParams(window.location.search).get('convite') ?? undefined
+}
 
 function GoogleGlyph() {
   return (
@@ -41,6 +53,25 @@ function GoogleGlyph() {
 }
 
 export default function EntrarPage() {
+  const { status, user } = useAuth()
+
+  const urlToken = readInviteTokenFromLocation()
+  const token = urlToken ?? readPendingInviteToken() ?? undefined
+
+  useEffect(() => {
+    if (urlToken) writePendingInviteToken(urlToken)
+  }, [urlToken])
+
+  // Com sessão já resolvida e um token em mãos, o resgate acontece aqui —
+  // nunca cria um espaço novo para quem chegou por convite (D-07).
+  if (token && status === 'signed-in' && user) {
+    return <JoinInviteScreen token={token} uid={user.uid} />
+  }
+
+  return <SignInCard token={token} />
+}
+
+function SignInCard({ token }: { token?: string }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
 
@@ -48,6 +79,10 @@ export default function EntrarPage() {
     setLoading(true)
     setError(false)
     try {
+      // Guardado ANTES do redirect — é a garantia de que o token sobrevive
+      // à ida-e-volta completa até accounts.google.com, mesmo se a query
+      // string `convite` não voltar junto com o retorno do provedor.
+      if (token) writePendingInviteToken(token)
       // signInWithRedirect navega para fora do app — se a Promise resolver
       // sem redirecionar de fato (raro; alguns navegadores), fica em
       // loading até onAuthStateChanged assumir.
