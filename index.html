@@ -8,6 +8,39 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Rede de seguranca de inicializacao: um throw no carregamento do modulo
+         (config do Firebase incompleta, por exemplo) acontece ANTES do React
+         montar, entao o resultado seria uma tela branca e um erro que so
+         aparece no console. Aqui o erro vira texto legivel na propria tela.
+         Nao substitui tratamento de erro do app — cobre so a janela entre
+         carregar o bundle e o React assumir. -->
+    <script>
+      window.addEventListener('error', function (evento) {
+        var raiz = document.getElementById('root')
+        if (!raiz || raiz.childElementCount > 0) return
+        var msg = (evento && evento.message) || 'Erro desconhecido na inicialização.'
+        raiz.setAttribute(
+          'style',
+          'font:15px/1.6 system-ui,sans-serif;padding:32px;max-width:60ch;margin:0 auto;color:#eee',
+        )
+        var h = document.createElement('h1')
+        h.textContent = 'O app não conseguiu iniciar'
+        h.setAttribute('style', 'font-size:22px;margin:0 0 12px')
+        var p1 = document.createElement('p')
+        p1.textContent = msg
+        p1.setAttribute(
+          'style',
+          'background:#2a1c1c;border:1px solid #5a2b2b;border-radius:8px;padding:12px;white-space:pre-wrap',
+        )
+        var p2 = document.createElement('p')
+        p2.textContent =
+          'Se a mensagem cita uma variável VITE_, confira o arquivo .env.local (não o .env.local.example) e reinicie o servidor de desenvolvimento.'
+        p2.setAttribute('style', 'color:#aaa')
+        raiz.appendChild(h)
+        raiz.appendChild(p1)
+        raiz.appendChild(p2)
+      })
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
