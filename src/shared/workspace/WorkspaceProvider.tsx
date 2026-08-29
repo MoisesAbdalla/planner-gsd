@@ -41,16 +41,26 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     setStatus('loading')
 
     function subscribeToWorkspaceDoc(workspaceId: string) {
-      unsubscribeSnapshot = onSnapshot(doc(db, 'workspaces', workspaceId), (snap) => {
-        if (!snap.exists()) {
+      unsubscribeSnapshot = onSnapshot(
+        doc(db, 'workspaces', workspaceId),
+        (snap) => {
+          if (!snap.exists()) {
           setWorkspace(null)
           setStatus('none')
           return
         }
         const data = snap.data() as Omit<Workspace, 'id'>
         setWorkspace({ id: snap.id, ...data })
-        setStatus('ready')
-      })
+          setStatus('ready')
+        },
+        (error) => {
+          // Falha de leitura NUNCA pode ser silenciosa: sem este handler o
+          // listener simplesmente nunca dispara e a tela carrega para sempre.
+          console.error('[workspace] leitura de /workspaces negada ou falhou:', error)
+          setWorkspace(null)
+          setStatus('none')
+        },
+      )
     }
 
     async function resolveAndSubscribe(uid: string) {
@@ -67,7 +77,9 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         // sem aguardar para não atrasar a assinatura do nome do espaço na
         // tela; falha aqui é silenciosa — não impede o app de abrir, só
         // deixa as categorias incompletas até a próxima tentativa.
-        void categorySeeding.seedDefaultCategories(existingId).catch(() => {})
+        void categorySeeding
+          .seedDefaultCategories(existingId)
+          .catch((error) => console.error('[workspace] seeding de categorias falhou:', error))
         subscribeToWorkspaceDoc(existingId)
         return
       }
@@ -99,7 +111,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       subscribeToWorkspaceDoc(workspaceId)
     }
 
-    resolveAndSubscribe(user.uid).catch(() => {
+    resolveAndSubscribe(user.uid).catch((error) => {
+      console.error('[workspace] falha ao resolver ou criar o espaço:', error)
       if (!cancelled) setStatus('none')
     })
 
