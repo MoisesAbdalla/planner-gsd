@@ -87,8 +87,8 @@ function CategoryListInner({
   const isEmpty = !loading && !error && active.length === 0 && archived.length === 0
 
   return (
-    <div className="flex min-w-0 flex-col gap-lg">
-      <div className="flex items-center justify-between gap-md">
+    <div className="flex min-w-0 flex-col gap-6">
+      <div className="flex items-center justify-between gap-4">
         <h1 className="text-heading font-semibold text-fg">Categorias</h1>
         <Button type="button" onClick={() => setCreateOpen(true)}>
           <Plus aria-hidden className="size-4" />
@@ -99,7 +99,7 @@ function CategoryListInner({
       {loading && <CenteredSpinner />}
 
       {isEmpty && (
-        <div className="flex flex-col items-start gap-xs">
+        <div className="flex flex-col items-start gap-1">
           <p className="text-body font-semibold text-fg">{EMPTY_HEADING}</p>
           <p className="text-body text-fg-muted">{EMPTY_BODY}</p>
         </div>
@@ -109,7 +109,7 @@ function CategoryListInner({
         <>
           {/* min-w-0: cada CategoryRow trunca o nome com ellipsis sem
               nunca provocar rolagem horizontal (PLAT-02). */}
-          <ul className="flex min-w-0 flex-col gap-xs">
+          <ul className="flex min-w-0 flex-col gap-1">
             {active.map((category) => (
               <CategoryRow
                 key={category.id}
@@ -121,7 +121,7 @@ function CategoryListInner({
           </ul>
 
           {archived.length > 0 && (
-            <div className="flex flex-col gap-xs">
+            <div className="flex flex-col gap-1">
               <button
                 type="button"
                 aria-expanded={showArchived}
@@ -135,7 +135,7 @@ function CategoryListInner({
                 // archived já vem ordenada por nome (mesmo filtro do array
                 // ordenado devolvido pelo listener) — nunca intercalada com
                 // as ativas (CAT-04 ordering).
-                <ul className="flex min-w-0 flex-col gap-xs">
+                <ul className="flex min-w-0 flex-col gap-1">
                   {archived.map((category) => (
                     <CategoryRow
                       key={category.id}

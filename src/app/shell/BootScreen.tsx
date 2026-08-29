@@ -10,7 +10,7 @@ export function BootScreen() {
     <div
       role="status"
       aria-live="polite"
-      className="flex min-h-screen flex-col items-center justify-center gap-md bg-dominant"
+      className="flex min-h-screen flex-col items-center justify-center gap-4 bg-dominant"
     >
       <span className="text-display font-semibold text-fg">Cotidiano</span>
       <span className="sr-only">Carregando…</span>
@@ -20,8 +20,8 @@ export function BootScreen() {
 
 export function BootErrorScreen({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-lg bg-dominant px-md text-center">
-      <div className="flex flex-col gap-xs">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-dominant px-4 text-center">
+      <div className="flex flex-col gap-1">
         <h1 className="text-heading font-semibold text-fg">Algo não funcionou.</h1>
         <p className="text-body text-fg-muted">Tenta de novo?</p>
       </div>

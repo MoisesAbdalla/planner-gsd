@@ -23,7 +23,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="flex min-h-screen flex-1 flex-col">
         {/* Barra superior — só abaixo de 768px; a partir dali o rail já
             carrega nome do espaço + avatar. */}
-        <header className="flex h-14 shrink-0 items-center justify-between gap-sm border-b border-border bg-surface px-md md:hidden">
+        <header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-border bg-surface px-4 md:hidden">
           <WorkspaceNameField className="min-w-0 flex-1" />
           <AvatarMenu />
         </header>
@@ -31,7 +31,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         {/* pb-24: limpa a barra de navegação fixa embaixo no mobile
             (~64px + safe-area-inset-bottom). */}
         <main className="flex-1 overflow-y-auto pb-24 md:pb-0">
-          <div className="mx-auto w-full max-w-6xl px-md py-lg md:px-xl md:py-xl 2xl:px-3xl">
+          <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-8 md:py-8 2xl:px-16">
             {children}
           </div>
         </main>

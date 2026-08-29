@@ -94,9 +94,9 @@ function SignInCard({ token }: { token?: string }) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-dominant px-md">
-      <div className="w-full max-w-sm rounded-lg bg-surface p-xl shadow-sm">
-        <div className="flex flex-col items-center gap-xs text-center">
+    <div className="flex min-h-screen items-center justify-center bg-dominant px-4">
+      <div className="w-full max-w-sm rounded-lg bg-surface p-8 shadow-sm">
+        <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-heading font-semibold text-fg">Cotidiano</h1>
           <p className="text-body text-fg-muted">Seus dados ficam só entre vocês dois.</p>
         </div>
@@ -105,7 +105,7 @@ function SignInCard({ token }: { token?: string }) {
           type="button"
           onClick={() => void handleSignIn()}
           disabled={loading}
-          className="mt-lg flex h-11 w-full items-center justify-center gap-sm rounded-lg border border-border bg-surface text-body font-semibold text-fg outline-none transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-60"
+          className="mt-6 flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-border bg-surface text-body font-semibold text-fg outline-none transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-60"
         >
           {loading ? (
             <span
@@ -119,7 +119,7 @@ function SignInCard({ token }: { token?: string }) {
         </button>
 
         {error && (
-          <p role="alert" className="mt-sm text-label text-destructive">
+          <p role="alert" className="mt-2 text-label text-destructive">
             Não deu para entrar com o Google agora. Tenta de novo em instantes.
           </p>
         )}

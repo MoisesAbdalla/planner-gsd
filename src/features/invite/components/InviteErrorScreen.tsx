@@ -45,8 +45,8 @@ export function InviteErrorScreen({ code }: { code: JoinInviteErrorCode }) {
   const { title, body } = VARIANTS[code]
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-lg bg-dominant px-md text-center">
-      <div className="flex flex-col gap-xs">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-dominant px-4 text-center">
+      <div className="flex flex-col gap-1">
         <h1 className="text-heading font-semibold text-fg">{title}</h1>
         <p className="text-body text-fg-muted">{body}</p>
       </div>

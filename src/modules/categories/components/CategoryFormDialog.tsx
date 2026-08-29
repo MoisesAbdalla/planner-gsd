@@ -167,8 +167,8 @@ function CategoryFormDialogContent({
   const submitting = form.formState.isSubmitting
 
   const body = (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-md" noValidate>
-      <div className="flex flex-col gap-xs">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
+      <div className="flex flex-col gap-1">
         <Label htmlFor="category-name">Nome</Label>
         <Controller
           control={form.control}
@@ -194,7 +194,7 @@ function CategoryFormDialogContent({
         />
       </div>
 
-      <div className="flex flex-col gap-xs">
+      <div className="flex flex-col gap-1">
         <Label>Cor</Label>
         <Controller
           control={form.control}

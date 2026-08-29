@@ -113,11 +113,11 @@ export function InviteDialog() {
   }
 
   const body = (
-    <div className="flex flex-col gap-md">
+    <div className="flex flex-col gap-4">
       {loading ? (
         // E2/loading: o spinner ocupa o lugar do campo enquanto o convite é
         // gerado — nunca o campo com um valor vazio/placeholder.
-        <div className="flex h-11 items-center gap-sm rounded-lg border border-border px-md">
+        <div className="flex h-11 items-center gap-2 rounded-lg border border-border px-4">
           <span
             aria-hidden
             className="size-4 shrink-0 animate-spin rounded-full border-2 border-fg-muted border-t-transparent"

@@ -18,13 +18,13 @@ export function SideRail() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
 
   return (
-    <aside className="hidden w-60 shrink-0 flex-col gap-xl border-r border-border bg-surface px-md py-lg md:flex">
-      <div className="flex items-center justify-between gap-sm">
+    <aside className="hidden w-60 shrink-0 flex-col gap-8 border-r border-border bg-surface px-4 py-6 md:flex">
+      <div className="flex items-center justify-between gap-2">
         <WorkspaceNameField className="min-w-0 flex-1" />
         <AvatarMenu />
       </div>
 
-      <nav aria-label="Navegação principal" className="flex flex-col gap-xs">
+      <nav aria-label="Navegação principal" className="flex flex-col gap-1">
         {NAV_ITEMS.map(({ to, label, icon: Icon, module }) => {
           const active = pathname.startsWith(to)
           return (
@@ -35,7 +35,7 @@ export function SideRail() {
               aria-current={active ? 'page' : undefined}
               className={cn(
                 // min-h-11: alvo de toque de 44px.
-                'flex min-h-11 items-center gap-sm rounded-full px-md py-2 text-body',
+                'flex min-h-11 items-center gap-2 rounded-full px-4 py-2 text-body',
                 active ? 'bg-accent/15 font-semibold text-accent' : 'text-fg-muted hover:bg-muted',
               )}
             >

@@ -48,17 +48,18 @@
   --text-display: 2rem; /* 32px */
   --text-display--line-height: 1.15;
 
-  /* Espaçamento — 7 degraus (4/8/16/24/32/48/64px). D-15: na dúvida entre
-     dois degraus, prefira o maior — "poucos elementos por tela" é critério
-     de aceite. Nomeados (gap-lg, p-xl…) além da escala numérica nativa do
-     Tailwind, para leitura semântica no código do shell. */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-2xl: 48px;
-  --spacing-3xl: 64px;
+  /* Espaçamento — 7 degraus (4/8/16/24/32/48/64px), D-15: na dúvida entre
+     dois degraus, prefira o maior. NÃO há token customizado aqui de
+     propósito: a escala nativa do Tailwind já entrega exatamente esses
+     valores como 1/2/4/6/8/12/16 (gap-4 = 16px, p-6 = 24px).
+
+     NUNCA redefinir --spacing-* com nomes de tamanho (xs/sm/md/lg/xl/2xl).
+     Esses mesmos nomes alimentam max-w-*, e o espaçamento tem precedência
+     sobre a escala de container: enquanto --spacing-sm existiu, max-w-sm
+     valia 8px e TODO diálogo e card do app colapsava para uma tira estreita.
+     Declarar --container-* explicitamente NÃO resolve — foi tentado; só
+     remover os tokens de espaçamento resolve. Nenhum dos 162 testes pegou
+     isso, porque nenhum mede largura renderizada. */
 
   /* Raio — cantos arredondados generosos (D-17, personalidade calorosa,
      não-bancária). Sobrescreve a escala padrão do Tailwind: rounded-lg em

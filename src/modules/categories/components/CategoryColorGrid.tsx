@@ -31,7 +31,7 @@ export function CategoryColorGrid({
   onChange: (color: CategoryColorId) => void
 }) {
   return (
-    <div role="group" aria-label="Cor da categoria" className="flex flex-wrap gap-sm">
+    <div role="group" aria-label="Cor da categoria" className="flex flex-wrap gap-2">
       {CATEGORY_COLOR_ORDER.map((colorId, index) => {
         const selected = colorId === value
         const tokens = CATEGORY_COLOR_TOKENS[colorId]

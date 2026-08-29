@@ -41,7 +41,7 @@ export function CategoryRow({
     CATEGORY_COLOR_TOKENS[category.color as CategoryColorId] ?? CATEGORY_COLOR_TOKENS.outros
 
   return (
-    <li className="flex min-w-0 items-center gap-sm rounded-lg px-sm py-sm">
+    <li className="flex min-w-0 items-center gap-2 rounded-lg px-2 py-2">
       <span
         aria-hidden
         data-category-swatch

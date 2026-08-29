@@ -51,7 +51,7 @@ export function JoinInviteScreen({ token, uid }: { token: string; uid: string })
     <div
       role="status"
       aria-live="polite"
-      className="flex min-h-screen flex-col items-center justify-center gap-md bg-dominant"
+      className="flex min-h-screen flex-col items-center justify-center gap-4 bg-dominant"
     >
       <span
         aria-hidden
