@@ -37,3 +37,6 @@ ui-debug.log
 
 # Vitest / coverage
 coverage
+
+# Sentinel de runtime do GSD — reescrito a cada dispatch
+.gsd/
